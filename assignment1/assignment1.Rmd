@@ -3,9 +3,11 @@
 title: "Assignment 1, EDDA 2017"
 author: "Arash and Fabio, group 22"
 date: "5 April 2017"
-output: pdf_document
-fontsize: 11pt
+output:
+  html_document: default
+  pdf_document: default
 highlight: tango
+fontsize: 11pt
 ---
 
 ## Introduction
@@ -107,6 +109,34 @@ plot(iris$Sepal.Length,iris$Petal.Length,xlab="Sepal.Length",ylab="Petal.Length"
 
 Chunk option `fig.align`  takes values 'left', 'right', or 'center'.
 
+
+## EXERCISE 1
+If you place the file assign1.RData in your R-directory and type
+> load(file="assign1.RData")
+you will have data vectors x1, x2,..., x5 in your R working directory. Make a histogram and a QQ-plot for each of them, and decide which ones could have been sampled from a normal distribution. Experiment by simulating some normal samples of similar sizes and looking at their QQ-plots, before you make up your mind!
+
+```{r}
+load(file="assign1.RData")
+
+```
+### 1.1 Figures
+```{r,fig.margin = TRUE,fig.width=6,fig.height=3}
+par(mfrow=c(1,2))
+hist(x1); qqnorm(x1)
+hist(x2); qqnorm(x2)
+hist(x3); qqnorm(x3)
+hist(x4); qqnorm(x4)
+hist(x5); qqnorm(x5)
+```
+comparing above graph to graphs of normal samples
+the QQ plot shows linear corleation in a sample of 1000 from a normal distribution 
+x3 and x4 are the 
+### 1.2 Figures
+```{r,fig.margin = TRUE,fig.width=6,fig.height=3}
+x=rnorm(1000)
+par(mfrow=c(1,2))
+hist(x) ; qqnorm(x)
+```
 ***
 
 ## Exercise 2
@@ -137,30 +167,10 @@ The value of t-statistics in the above evaluation is  `r round(ttest[[1]],2)` an
   
 
 
-EXERCISE 1
-If you place the file assign1.RData in your R-directory and type
-load(file="assign1.RData")
-you will have data vectors x1, x2,..., x5 in your R working directory. Make a histogram and a QQ-plot for each of them, and decide which ones could have been sampled from a normal distribution. Experiment by simulating some normal samples of similar sizes and looking at their QQ-plots, before you make up your mind!
-
-```{r}
-load(file="assign1.RData")
-
-```
-### 1.2 Figures
-
-You can control the size and placement of figures. For example, 
-you can put two figures (or more) next to each other. 
-Use `par(mfrow=c(n,m))` to create `n` by `m` plots in one picture in R.
-You can adjust the proportions of figures using the `fig.width` 
-and `fig.height` chunk options. These are specified in inches, 
-and will be automatically scaled down to fit within the handout margin.
 
 
-```{r,fig.margin = TRUE,fig.width=6,fig.height=3}
-par(mfrow=c(1,2))
-hist(x1); qqnorm(x1)
-hist(x2); qqnorm(x2)
-hist(x3); qqnorm(x3)
-hist(x4); qqnorm(x4)
-hist(x5); qqnorm(x5)
-```
+EXERCISE 2
+1. Set mu=nu=180, m=n=30 and sd=10. Repeat the script 1000 times, and record the 1000 p-values. How many p-values are smaller than 5%? How many are smaller than 10%? What is the distribution of the p-values (make a histogram)?
+2. Set mu=nu=180, m=n=30 and sd=1. Answer the same questions.
+3. Set mu=180, nu=175, m=n=30 and sd=6. Answer the same questions.
+4. Explain the findings.
