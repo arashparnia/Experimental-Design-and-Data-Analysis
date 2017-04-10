@@ -1,0 +1,166 @@
+
+---
+title: "Assignment 1, EDDA 2017"
+author: "Arash and Fabio, group 22"
+date: "5 April 2017"
+output: pdf_document
+fontsize: 11pt
+highlight: tango
+---
+
+## Introduction
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. R Markdown files permit you to interweave R code with ordinary text to produce well-formatted data analysis reports that are easy to modify. The R Markdown file itself shows the readers exactly how you got the results in your report.
+For more details on using R Markdown see [http://rmarkdown.rstudio.com](http://rmarkdown.rstudio.com).
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. 
+Inline R code: for the build-in R dataset `cars`, there were `r nrow(cars)` 
+cars studied. You can embed an R code chunk like this:
+
+```{r}
+summary(cars)
+```
+
+You can also embed plots, for example:
+
+```{r, echo=FALSE}
+plot(cars)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+### Equations
+
+You can also include \LaTeX\ equations in your report:
+inline $\frac{d}{dx}\left( \int_{0}^{x} f(u)\,du\right)=f(x)$ and 
+in the display mode:
+$$\frac{d}{dx}\left( \int_{0}^{x} f(u)\,du\right)=f(x).$$
+ 
+### Footnotes
+
+Here is the use of a footnote^[This is a footnote.]. 
+
+### Tables
+
+It is also easy to make table by using knit's `kable` function:
+
+```{r echo=FALSE, results='asis'}
+library(knitr)
+kable(mtcars[1:5,],caption="A knit kable.")
+```
+
+### Varia
+
+A friend once said:
+
+> It's always better to give
+> than to receive.
+
+```
+This text is displayed verbatim / preformatted
+```
+http://example.com
+
+[linked phrase](http://example.com)
+
+*italic*   **bold**
+
+_italic_   __bold__
+
+***
+
+## Exercise 1
+
+### 1.1 Some R-commands
+
+```{r}
+x=rep(c("A","B"),each=5); x
+sample(x)
+rbinom(10,1,0.5)
+rbinom(10,1,0.5)
+rbinom(5,1,0.8)
+x=rnorm(100)
+```
+
+The same code chunk but with all the output collapsed into signle block.
+
+```{r, collapse=TRUE}
+x=rep(c("A","B"),each=5); x
+sample(x)
+rbinom(10,1,0.5)
+rbinom(10,1,0.5)
+rbinom(5,1,0.8)
+x=rnorm(100)
+```
+
+
+
+
+You can arrange for figures to span across the entire page by using 
+the `fig.fullwidth` chunk option. Note the use of the `fig.width` and 
+`fig.height` chunk options to establish the proportions of the figure. 
+Full width figures look much better if their height is minimized.
+
+```{r,fig.fullwidth=TRUE,fig.height=3}
+plot(iris$Sepal.Length,iris$Petal.Length,xlab="Sepal.Length",ylab="Petal.Length")
+```
+
+Chunk option `fig.align`  takes values 'left', 'right', or 'center'.
+
+***
+
+## Exercise 2
+
+### 2.1 T-test
+
+Below we perform a one sample t-test for the artificial date 
+(that we generated ourselves).
+
+```{r}
+mu=0.2
+x=rnorm(100,mu,1) # creating artificial data
+t.test(x,mean=0)   # t.test(x,alternative=c("two.sided"),conf.level=0.95,mu=10)
+```
+
+ 
+Of course, we often do not need to report the whole output of R-commands, only certain
+values of the output. For example, below we perform a two-smaple t-test and report 
+only the value of t-statistics and the p-pavue.
+
+```{r}
+mu=0;nu=0.5
+x=rnorm(50,mu,1); y=rnorm(50,nu,1) # creating artificial data
+ttest=t.test(x,y) 
+```
+
+The value of t-statistics in the above evaluation is  `r round(ttest[[1]],2)` and the p-value is `r round(ttest[[3]],4)`.
+  
+
+
+EXERCISE 1
+If you place the file assign1.RData in your R-directory and type
+load(file="assign1.RData")
+you will have data vectors x1, x2,..., x5 in your R working directory. Make a histogram and a QQ-plot for each of them, and decide which ones could have been sampled from a normal distribution. Experiment by simulating some normal samples of similar sizes and looking at their QQ-plots, before you make up your mind!
+
+```{r}
+load(file="assign1.RData")
+
+```
+### 1.2 Figures
+
+You can control the size and placement of figures. For example, 
+you can put two figures (or more) next to each other. 
+Use `par(mfrow=c(n,m))` to create `n` by `m` plots in one picture in R.
+You can adjust the proportions of figures using the `fig.width` 
+and `fig.height` chunk options. These are specified in inches, 
+and will be automatically scaled down to fit within the handout margin.
+
+
+```{r,fig.margin = TRUE,fig.width=6,fig.height=3}
+par(mfrow=c(1,2))
+hist(x1); qqnorm(x1)
+hist(x2); qqnorm(x2)
+hist(x3); qqnorm(x3)
+hist(x4); qqnorm(x4)
+hist(x5); qqnorm(x5)
+```
