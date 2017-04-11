@@ -82,8 +82,44 @@ The value of t-statistics in the above evaluation is  `r round(ttest[[1]],2)` an
 
 
 
-EXERCISE 2
-1. Set mu=nu=180, m=n=30 and sd=10. Repeat the script 1000 times, and record the 1000 p-values. How many p-values are smaller than 5%? How many are smaller than 10%? What is the distribution of the p-values (make a histogram)?
-2. Set mu=nu=180, m=n=30 and sd=1. Answer the same questions.
-3. Set mu=180, nu=175, m=n=30 and sd=6. Answer the same questions.
-4. Explain the findings.
+#EXERCISE 2
+
+```{r}
+twoSampleT <- function(mu,nu,m,n,sd,pValue){
+  B=1000
+  p=numeric(B)
+  c = 0  
+  c10 =0; 
+  for (b in 1:B) {
+    x=rnorm(m,mu,sd)
+    y=rnorm(n,nu,sd)
+    p[b]=t.test(x,y,var.equal=TRUE)[[3]]
+    if (p[b] < pValue){ c= c+1}
+  }
+  power=mean(p<0.05)
+  hist(p)
+}
+```
+
+### 1. Set mu=nu=180, m=n=30 and sd=10. Repeat the script 1000 times, and record the 1000 p-values. How many p-values are smaller than 5%? How many are smaller than 10%? What is the distribution of the p-values (make a histogram)?
+
+```{r}
+par(mfrow=c(1,2))
+print(twoSampleT(180,180,30,30,10,0.05))
+print(twoSampleT(180,180,30,30,10,0.10))
+
+```
+### 2. Set mu=nu=180, m=n=30 and sd=1. Answer the same questions.
+```{r}
+par(mfrow=c(1,2))
+print(twoSampleT(180,180,30,30,1,0.05))
+print(twoSampleT(180,180,30,30,1,0.10))
+```
+
+###3. Set mu=180, nu=175, m=n=30 and sd=6. Answer the same questions.
+```{r}
+par(mfrow=c(1,2))
+print(twoSampleT(180,175,30,30,6,0.05))
+print(twoSampleT(180,175,30,30,6,0.10))
+```
+###4. Explain the findings.
