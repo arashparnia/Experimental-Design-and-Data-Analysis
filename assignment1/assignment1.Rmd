@@ -97,7 +97,7 @@ twoSampleT <- function(mu,nu,m,n,sd,pValue){
     if (p[b] < pValue){ c= c+1}
   }
   power=mean(p<0.05)
-  hist(p)
+  hist(p,main=c("with",pValue ))
 }
 ```
 
