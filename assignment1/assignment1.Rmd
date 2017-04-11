@@ -88,8 +88,7 @@ The value of t-statistics in the above evaluation is  `r round(ttest[[1]],2)` an
 twoSampleT <- function(mu,nu,m,n,sd,pValue){
   B=1000
   p=numeric(B)
-  c = 0  
-  c10 =0; 
+  c = 0
   for (b in 1:B) {
     x=rnorm(m,mu,sd)
     y=rnorm(n,nu,sd)
@@ -105,17 +104,14 @@ twoSampleTNU <- function(mu,nuMin,nuMax,nuStep,m,n,sd,pValue){
   B=1000
   p=numeric(B)
   power = numeric(B)
-  c = 0  
-  c10 =0
   for (nu in seq(nuMin,nuMax,by=nuStep)){
-  for (b in 1:B) {
-    x=rnorm(m,mu,sd)
-    y=rnorm(n,nu,sd)
-    p[b]=t.test(x,y,var.equal=TRUE)[[3]]
-    if (p[b] < pValue){ c= c+1}
+    for (b in 1:B) {
+      x=rnorm(m,mu,sd)
+      y=rnorm(n,nu,sd)
+      p[b]=t.test(x,y,var.equal=TRUE)[[3]]
+    }
+    power[nu]=mean(p<pValue)
   }
-  power[nu]=mean(p<0.05)
-}
   hist(power,main=c("with",pValue ))
 }
 ```
@@ -146,6 +142,16 @@ print(twoSampleT(180,175,30,30,6,0.10))
 
 #EXERCISE 3
 ###1. Set mu=180, m=n=30 and sd=5. Calculate the power of the t-test for every value of nu in the grid seq(175,185,by=0.1). Plot the power as a function of nu.
+```{r}
+print(twoSampleTNU(180,175,185,0.1,30,30,5,0.05))
+```
+
 ###2. Set mu=180, m=n=100 and sd=5. Repeat the preceding exercise. Add the plot to the preceding plot.
+```{r}
+print(twoSampleTNU(180,175,185,0.1,100,100,5,0.05))
+```
 ###3. Set mu=180, m=n=30 and sd=100. Repeat the preceding exercise.
+```{r}
+print(twoSampleTNU(180,175,185,0.1,30,30,100,0.05))
+```
 ###4. Explain the findings.
