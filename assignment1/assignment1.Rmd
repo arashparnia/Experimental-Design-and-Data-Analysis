@@ -98,22 +98,25 @@ twoSampleT <- function(mu,nu,m,n,sd,pValue){
   hist(p,main=c("with",pValue ))
 }
 ```
-
+Here after we have the code for computing the power of a test with respect to the
+different nu values. The power of a test is 1 minus the probability of an error of the second kind, which is the p-value. Thus, the power of a test is here defined as 1 - p-value. 
 ```{r}
 twoSampleTNU <- function(mu,nuMin,nuMax,nuStep,m,n,sd,pValue){
   B=1000
   p=numeric(B)
-  power = numeric(B)
-  for (nu in seq(nuMin,nuMax,by=nuStep)){
+  power = numeric()
+  nu = seq(nuMin,nuMax,by=nuStep)
+  for (i in 1:length(nu)){
     for (b in 1:B) {
       x=rnorm(m,mu,sd)
-      y=rnorm(n,nu,sd)
+      y=rnorm(n,nu[i],sd)
       p[b]=t.test(x,y,var.equal=TRUE)[[3]]
     }
-    power[nu]=mean(p<pValue)
+    power[i]=mean(p<1-pValue)
   }
-  hist(power,main=c("with",pValue ))
+  plot(nu,power,xlab = "nu",ylab ="power" ,type="l",lwd=2.5)
 }
+
 ```
 
 ### 1. Set mu=nu=180, m=n=30 and sd=10. Repeat the script 1000 times, and record the 1000 p-values. How many p-values are smaller than 5%? How many are smaller than 10%? What is the distribution of the p-values (make a histogram)?
@@ -155,3 +158,11 @@ print(twoSampleTNU(180,175,185,0.1,100,100,5,0.05))
 print(twoSampleTNU(180,175,185,0.1,30,30,100,0.05))
 ```
 ###4. Explain the findings.
+The plots in the previous Figure represent the following cases:
+
+Black: mu=180; m=n=30; sd=5;
+Red:mu=180; m=n=100; sd=5;
+Green: mu=180; m=n=30; sd=100;
+
+Comparing the black and red curves, the principal difference is the length of the sample, which is more than three times bigger in the second case. As the samples are randomly taken from an uniform distribution, the higher the amount of the sample, the better the power of the test in this case, as there will be more numbers randomly generated with central values around 180 and sd of 5.
+Furthermore, the power of the test is overall lower for the green case, which makes use of a higher standard deviation. Thus, the mean values of x and y are a lot more unlikely to match (which is the hipothesis H0).
