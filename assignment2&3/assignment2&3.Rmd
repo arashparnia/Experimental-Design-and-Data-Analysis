@@ -64,12 +64,15 @@ light from a source off a rapidly rotating mirror to a distant fixed mirror, and
 back to the rotating mirror. The velocity of light is then determined by measuring
 the distance involved, the speed of the rotating mirror and the angular
 displacement of the received image from its source.
+
 In 1879 Michelson performed 100 experiments to determine the speed of
 light and in 1882 another 23 experiments. The measurements in km/sec minus
 299000 are given in the file light1879.txt and light1882.txt, respectively.
+
 The file light.txt contains Newcomb’s measurements (made in 1882 on three
 different days: the first 20 measurements on day 1, the next 20 onday 2, the last
 26 on day 3) of the passage time it took light to travel the distance 7.442 km,
+
 The coding of Newcomb’s measurements is as follows: from the original times
 in microseconds measured by Newcomb first 24.8 was subtracted, after which
 the results were multiplied with 1000.
@@ -82,6 +85,21 @@ light1879 <- c(light1879$V1,light1879$V2,light1879$V3,light1879$V4,light1879$V5)
 light1882 <- c(light1882$V1,light1882$V2,light1882$V3,light1882$V4,light1882$V5)
 light1882 <- light1882[!is.na(light1882)] 
 light <- light$V1
+
+light1879 = light1879 + 299000
+light1882 = light1882 + 299000
+light1879 = light1879 /1000
+light1882 = light1882 / 1000
+
+
+light = light + (24.8)
+ light = (7442 / light ) 
+ 
+
+light = light[light > 0]
+
+
+
 par(mfrow=c(1,3))
 hist(light1879)
 hist(light1882)
@@ -95,6 +113,12 @@ boxplot(light)
 ```
 
 ####2. Determine confidence intervals for the speed of light in km/sec for all three data sets (use population means and medians).
+```{r}
+t.test(light1879)
+t.test(light1882)
+t.test(light)
+```
+
 ####3. Comment on the intervals found.
 ####4. Find on the internet the currently most accurate value for the speed of light. Is it consistent with the measurements of Michelson and Newcomb?
 1
