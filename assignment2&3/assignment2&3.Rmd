@@ -3,8 +3,6 @@ title: "Experimental Design and Data Analysis: Assignment 2 and Assignment 2"
 output: html_notebook
 ---
 
-
-
 ***
 ##Assignment 2
 be performed using a level of 0.05, unless otherwise specified.
@@ -271,7 +269,32 @@ pairs(peruvians)
 
 We obtain the pairs plot for the correlation between variables V1, V3, V4, V8, V9 and V10 with V2. From this plot, we decided that only the variable "age" would be correlated to "migration", as it is the only which seemly respects an uprising behaviour, as in the oldest the person, the longest he/she has been under the status of migrator. 
 
+Now, we will study the correlation of these variables with "migration".
 
+```{r}
+age=as.numeric(levels(peruvians$V1))[peruvians$V1]
+age=age[2:end(age)]
+migration=as.numeric(levels(peruvians$V2))[peruvians$V2]
+migration=migration[2:end(migration)]
+weight=as.numeric(levels(peruvians$V3))[peruvians$V3]
+weight=weight[2:end(weight)]
+length=as.numeric(levels(peruvians$V4))[peruvians$V4]
+length=length[2:end(length)]
+wrist=as.numeric(levels(peruvians$V8))[peruvians$V8]
+wrist=wrist[2:end(wrist)]
+systolic=as.numeric(levels(peruvians$V9))[peruvians$V9]
+systolic=systolic[2:end(systolic)]
+diastolic=as.numeric(levels(peruvians$V10))[peruvians$V10]
+diastolic=diastolic[2:end(diastolic)]
+```
+```{r}
+cor(age,migration)
+cor(weight,migration)
+cor(length,migration)
+cor(wrist,migration)
+cor(systolic,migration)
+cor(diastolic,migration)
+```
 
-
+By the numbers here above, we can confirm what was before stated that the variable which is most likely to be correlated to migration is age. The other variables had a very low or even negative values. The variable "weight" had correlation of 0.4811, which is not as low as the others, however we can't consider here it being correlated to "migration" as this value is still low.
 
