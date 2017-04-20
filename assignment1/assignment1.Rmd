@@ -1,0 +1,168 @@
+
+---
+title: "Assignment 1, EDDA 2017"
+author: "Arash and Fabio, group 22"
+date: "5 April 2017"
+output:
+  html_document: default
+  pdf_document: default
+highlight: tango
+fontsize: 11pt
+---
+
+## EXERCISE 1
+If you place the file assign1.RData in your R-directory and type
+> load(file="assign1.RData")
+you will have data vectors x1, x2,..., x5 in your R working directory. Make a histogram and a QQ-plot for each of them, and decide which ones could have been sampled from a normal distribution. Experiment by simulating some normal samples of similar sizes and looking at their QQ-plots, before you make up your mind!
+
+```{r}
+load(file="assign1.RData")
+
+```
+### 1.1 Figures
+```{r,fig.margin = TRUE,fig.width=6,fig.height=3}
+par(mfrow=c(1,2))
+hist(x1); qqnorm(x1); shapiro.test(x1)
+hist(x2); qqnorm(x2);shapiro.test(x2)
+hist(x3); qqnorm(x3);shapiro.test(x3)
+hist(x4); qqnorm(x4);shapiro.test(x4)
+hist(x5); qqnorm(x5);shapiro.test(x5)
+```
+comparing above graph to graphs of normal samples
+the QQ plot shows linear corleation in a sample of 1000 from a normal distribution 
+x3 and x4 are the 
+From the five histogram and QQ-plots here above, we should be able to identify
+whether # the data follows a normal distribution. a plot using qqnorm of a
+sample from a normal distribution will #show approximately a straight line, and
+a deviation from a line indicates that #the sample was not taken from a normal
+population. We have that  x1, #x2, x3, x4 and x5 have sizes of 20, 100, 100, 30
+and 40, respectively.
+
+The elements x2, x3 and x4 look very much like a QQ-plot of #a normal
+distribution. Even though x1 has an uprising behavior, it could still #have been
+sampled from a non-normal distribution as it does not exactly follow #a straight
+line behaviour. Finally, the x5 curve looks more like an exponential one rather
+than #a straight line, thus it does not invite the thought that it has been
+sampled #from a normal distribution. ### 1.2 Figures
+
+```{r,fig.margin = TRUE,fig.width=6,fig.height=3}
+x=rnorm(1000)
+par(mfrow=c(1,2))
+hist(x) ; qqnorm(x)
+```
+***
+
+## Exercise 2
+
+### 2.1 T-test
+
+Below we perform a one sample t-test for the artificial date 
+(that we generated ourselves).
+
+```{r}
+mu=0.2
+x=rnorm(100,mu,1) # creating artificial data
+t.test(x,mean=0)   # t.test(x,alternative=c("two.sided"),conf.level=0.95,mu=10)
+```
+
+ 
+Of course, we often do not need to report the whole output of R-commands, only certain
+values of the output. For example, below we perform a two-smaple t-test and report 
+only the value of t-statistics and the p-pavue.
+
+```{r}
+mu=0;nu=0.5
+x=rnorm(50,mu,1); y=rnorm(50,nu,1) # creating artificial data
+ttest=t.test(x,y) 
+```
+
+The value of t-statistics in the above evaluation is  `r round(ttest[[1]],2)` and the p-value is `r round(ttest[[3]],4)`.
+  
+
+
+
+
+#EXERCISE 2
+
+```{r}
+twoSampleT <- function(mu,nu,m,n,sd,pValue){
+  B=1000
+  p=numeric(B)
+  c = 0
+  for (b in 1:B) {
+    x=rnorm(m,mu,sd)
+    y=rnorm(n,nu,sd)
+    p[b]=t.test(x,y,var.equal=TRUE)[[3]]
+    if (p[b] < pValue){ c= c+1}
+  }
+  hist(p,main=c("with",pValue ))
+}
+```
+Here after we have the code for computing the power of a test with respect to the
+different nu values. The power of a test is 1 minus the probability of an error of the second kind, which is the p-value. Thus, the power of a test is here defined as 1 - p-value. 
+```{r}
+twoSampleTNU <- function(mu,nuMin,nuMax,nuStep,m,n,sd,pValue){
+  B=1000
+  p=numeric(B)
+  power = numeric()
+  nu = seq(nuMin,nuMax,by=nuStep)
+  for (i in 1:length(nu)){
+    for (b in 1:B) {
+      x=rnorm(m,mu,sd)
+      y=rnorm(n,nu[i],sd)
+      p[b]=t.test(x,y,var.equal=TRUE)[[3]]
+    }
+    power[i]=mean(p<1-pValue)
+  }
+  plot(nu,power,xlab = "nu",ylab ="power" ,type="l",lwd=2.5)
+}
+
+```
+
+### 1. Set mu=nu=180, m=n=30 and sd=10. Repeat the script 1000 times, and record the 1000 p-values. How many p-values are smaller than 5%? How many are smaller than 10%? What is the distribution of the p-values (make a histogram)?
+
+```{r}
+par(mfrow=c(1,2))
+print(twoSampleT(180,180,30,30,10,0.05))
+print(twoSampleT(180,180,30,30,10,0.10))
+
+```
+### 2. Set mu=nu=180, m=n=30 and sd=1. Answer the same questions.
+```{r}
+par(mfrow=c(1,2))
+print(twoSampleT(180,180,30,30,1,0.05))
+print(twoSampleT(180,180,30,30,1,0.10))
+```
+
+###3. Set mu=180, nu=175, m=n=30 and sd=6. Answer the same questions.
+```{r}
+par(mfrow=c(1,2))
+print(twoSampleT(180,175,30,30,6,0.05))
+print(twoSampleT(180,175,30,30,6,0.10))
+```
+###4. Explain the findings.
+
+
+#EXERCISE 3
+###1. Set mu=180, m=n=30 and sd=5. Calculate the power of the t-test for every value of nu in the grid seq(175,185,by=0.1). Plot the power as a function of nu.
+```{r}
+print(twoSampleTNU(180,175,185,0.1,30,30,5,0.05))
+```
+
+###2. Set mu=180, m=n=100 and sd=5. Repeat the preceding exercise. Add the plot to the preceding plot.
+```{r}
+print(twoSampleTNU(180,175,185,0.1,100,100,5,0.05))
+```
+###3. Set mu=180, m=n=30 and sd=100. Repeat the preceding exercise.
+```{r}
+print(twoSampleTNU(180,175,185,0.1,30,30,100,0.05))
+```
+###4. Explain the findings.
+The plots in the previous Figure represent the following cases:
+
+Black: mu=180; m=n=30; sd=5;
+Red:mu=180; m=n=100; sd=5;
+Green: mu=180; m=n=30; sd=100;
+
+Comparing the black and red curves, the principal difference is the length of the sample, which is more than three times bigger in the second case. As the samples are randomly taken from an uniform distribution, the higher the amount of the sample, the better the power of the test in this case, as there will be more numbers randomly generated with central values around 180 and sd of 5.
+Furthermore, the power of the test is overall lower for the green case, which makes use of a higher standard deviation. Thus, the mean values of x and y are a lot more unlikely to match (which is the hipothesis H0).
