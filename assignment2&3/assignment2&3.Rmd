@@ -445,39 +445,40 @@ qqnorm(rnorm(length(dogs$cyclopropane)), xlab="random", main="QQ-plot Cyclopropa
 # Create a data frame for isofluorane
 dogsframeiso = dogs[,-c(2,3)]
 isofluorane=as.vector(as.matrix(dogs))
-group1=as.numeric(rep(1:1,each=10))
+group1=as.factor(as.numeric(rep(1:1,each=10)))
 dogsframeiso = data.frame(isofluorane, group1)
 dogsframeiso[1:10,]
 
-# Perform Kruskal Wallis test isofluorane
-is.factor(dogsframeiso$group)
-is.numeric(dogsframeiso$group)
-attach(dogsframeiso)
-kruskal.test(isofluorane,group1)
 
 # Create a data frame for halothane
 dogsframehalo = dogs[,-c(1,3)]
 halothane=as.vector(as.matrix(dogs))
-group2=as.factor(rep(1:3,each=10))
+group2=as.factor(as.numeric(rep(1:3,each=10)))
 dogsframehalo = data.frame(halothane,group2)
 dogsframehalo[12:21,]
 
-# Perform Kruskal Wallis test halothane
-is.factor(dogsframehalo$group); is.numeric(dogsframehalo$group)
-attach(dogsframehalo)
-kruskal.test(halo,group2)
 
 # Create a data frame for cyclopropane
-dogsframecyclo = dogsframecyclo[,-c(1,2)]
+dogsframecyclo = dogs[,-c(1,2)]
 cyclopropane=as.vector(as.matrix(dogs))
-group3=as.factor(rep(1:3,each=10))
+group3=as.factor(as.numeric(rep(1:3,each=10)))
 dogsframecyclo = data.frame(cyclopropane,group3)
 dogsframecyclo[22:30,]
 
+
+
 # Perform Kruskal Wallis test isofluorane
-is.factor(dogsframecyclo$group); is.numeric(dogsframecyclo$group)
-attach(dogsframecyclo)
-kruskal.test(cyclo,group3)
+is.factor(dogsframeiso$group)
+is.numeric(dogsframeiso$group)
+kruskal.test(dogsframeiso$,dogsframeiso)
+# # Perform Kruskal Wallis test halothane
+# is.factor(dogsframehalo$group); 
+# is.numeric(dogsframehalo$group)
+# kruskal.test(halo,group2)
+# # Perform Kruskal Wallis test isofluorane
+# is.factor(dogsframecyclo$group); 
+# is.numeric(dogsframecyclo$group)
+# kruskal.test(cyclo,group3)
 
 ```
 
