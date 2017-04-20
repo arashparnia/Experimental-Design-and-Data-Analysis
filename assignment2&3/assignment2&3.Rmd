@@ -210,20 +210,9 @@ run_before
 run_before <- run_before[!is.na(run_before)] 
 # run = read.table('run.txt',header = FALSE)
 run_before
-# <!-- par(mfrow=c(1,3)) -->
-# plot(V2~V6,data=peruvians); abline(0,1)
-# names(peruvians);
-# plot(run$V2,peruvians$V6);
-# boxplot(clouds$V1)
-# boxplot(clouds[,1]-clouds[,2])
-
-
-#############################
-# Assignment 3 - Exercise 2 #
-#############################
 
 ## Pre-processing
-run = read.table("input/run.txt", header=TRUE)
+run = read.table("run.txt", header=TRUE)
 lemo = subset(run,drink=="lemo")[,-c(3)]
 energy = subset(run,drink=="energy")[,-c(3)]
 
@@ -245,35 +234,43 @@ qqnorm(energy$before,main="Normal Q-Q Plot energy (before)",
 qqnorm(energy$after,main="Normal Q-Q Plot energy (after)",
        ylab="Quantiles energy (after)")
 
-## Exercise 2.2 ##
+
+
+
+
+
+
+
+```
+####2. Test separately, for both the softdrink and the energy drink conditions, whether there is a difference in speed in the two running tasks.
+```{r}
 summary(lemo);
 t.test(lemo$before, lemo$after);
 
 summary(energy);
 t.test(energy$before, energy$after);
+```
 
-## Exercise 2.3 ##
+####3. For each pupil compute the time difference between the two running tasks. Test whether these time differences are effected by the type of drink.
+```{r}
 run$diff = run$after - run$before
 diff_lemo = subset(run,drink=="lemo")$diff
 diff_energy = subset(run,drink=="energy")$diff
 
 mean(run$diff);mean(diff_lemo);mean(diff_energy)
 t.test(diff_lemo, diff_energy)
+```
 
-## Exercise 2.6 ##
+####4. Can you think of a plausible objection to the design of the experiment if the main aim was to test whether drinking the energy drink speeds up the running?
+####5. Is there a similar objection to the design relative to the analysis under 3)?
+####6. The vector of differences in 3) has 24 elements. Which distributional assumption on these differences is needed for the analysis in 3)? How would you transform this vector into 24 residuals to investigate this assumption in QQ-plots? Make this QQ-plot(s).
+```{r}
 par(mfrow=c(1,2))
 qqnorm(diff_lemo,main="Normal Q-Q Plot time diff lemo",
        ylab="Quantiles time diff lemo")
 qqnorm(diff_energy,main="Normal Q-Q Plot time diff energy",
        ylab="Quantiles time diff energy")
-
-
 ```
-####2. Test separately, for both the softdrink and the energy drink conditions, whether there is a difference in speed in the two running tasks.
-####3. For each pupil compute the time difference between the two running tasks. Test whether these time differences are effected by the type of drink.
-####4. Can you think of a plausible objection to the design of the experiment if the main aim was to test whether drinking the energy drink speeds up the running?
-####5. Is there a similar objection to the design relative to the analysis under 3)?
-####6. The vector of differences in 3) has 24 elements. Which distributional assumption on these differences is needed for the analysis in 3)? How would you transform this vector into 24 residuals to investigate this assumption in QQ-plots? Make this QQ-plot(s).
 
 ##EXERCISE 3
 
@@ -292,6 +289,68 @@ conclusion here? Explain possible differences between this conclusion and
 the conclusion under part 2.
 3
 
+```{r}
+dogs <- read.table("dogs(2).txt", header=TRUE, quote="\"")
+View(dogs)
+
+par(mfrow=c(1,3))
+
+# Create boxplots of all 3 variables
+boxplot(dogs$isofluorane, xlab="Isofluorane")
+boxplot(dogs$halothane, xlab="Halothane")
+boxplot(dogs$cyclopropane, xlab="Cyclopropane")
+
+par(mfrow=c(1,2))
+
+# Create QQ-plots of Isofluorane and normal distribution
+qqnorm(dogs$isofluorane, xlab="sample", main="QQ-plot Isofluorane")
+qqnorm(rnorm(length(dogs$isofluorane)), xlab="random", main="QQ-plot Isofluorane")
+
+
+# Create QQ-plots of Halothane and normal distribution
+qqnorm(dogs$halothane, xlab="sample", main="QQ-plot Halothane")
+qqnorm(rnorm(length(dogs$halothane)), xlab="random", main="QQ-plot Halothane")
+
+# Create QQ-plots of Cycloprane and normal distribution
+qqnorm(dogs$cyclopropane, xlab="sample", main="QQ-plot Cyclopropane")
+qqnorm(rnorm(length(dogs$cyclopropane)), xlab="random", main="QQ-plot Cyclopropane")
+
+
+
+
+
+# Create a data frame for isofluorane
+dogsframeiso = dogs[,-c(2,3)]
+dogsframeiso = data.frame(iso=as.vector(as.matrix(dogs)), group1=as.factor(rep(1:1,each=10)))
+dogsframeiso[1:10,]
+
+# Perform Kruskal Wallis test isofluorane
+is.factor(dogsframeiso$group); is.numeric(dogsframeiso$group)
+attach(dogsframeiso)
+kruskal.test(iso,group1)
+
+# Create a data frame for halothane
+dogsframehalo = dogs[,-c(1,3)]
+dogsframehalo = data.frame(halo=as.vector(as.matrix(dogs)), group2=as.factor(rep(1:3,each=10)))
+dogsframehalo[12:21,]
+
+# Perform Kruskal Wallis test halothane
+is.factor(dogsframehalo$group); is.numeric(dogsframehalo$group)
+attach(dogsframehalo)
+kruskal.test(halo,group2)
+
+# Create a data frame for cyclopropane
+dogsframecyclo = dogsframecyclo[,-c(1,2)]
+dogsframecyclo = data.frame(cyclo=as.vector(as.matrix(dogs)), group3=as.factor(rep(1:3,each=10)))
+dogsframecyclo[22:30,]
+
+# Perform Kruskal Wallis test isofluorane
+is.factor(dogsframecyclo$group); is.numeric(dogsframecyclo$group)
+attach(dogsframecyclo)
+kruskal.test(cyclo,group3)
+
+
+```
 
 
 
