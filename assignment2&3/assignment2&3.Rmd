@@ -138,67 +138,124 @@ boxplot(light)
 
 ####2. Determine confidence intervals for the speed of light in km/sec for all three data sets (use population means and medians).
 ```{r}
-t.test(light1879)
-t.test(light1882)
-t.test(light)
 
-## Exercise 2.2 ##
 
-# Create table of means and medians
-data_summary = matrix(c(mean(light1879), median(light1879),
-                        mean(light1882), median(light1882),
-                        mean(light), median(light)),
-                      ncol=2,byrow=TRUE)
-colnames(data_summary) = c("Mean", "Median")
-rownames(data_summary) = c("light1879", "light1882", "light")
-data_summary = as.table(data_summary)
 
-# Create function to calculate confidence intervals
-conf_int = function(x, type="mean", B=1000)
-{
-  if (!((type=="mean")|(type=="median"))){stop("Only 'mean' and 'median' are accepted as type.")}
-  
-  if (type=="mean"){t1=mean(x)}
-    else if (type=="median"){t1=median(x)}
-  
-  tstar=numeric(B)
-  
-  if (type=="mean")
-  {
-    for (i in 1:B)
-    {
-      xstar=sample(x,replace=TRUE)
-      tstar[i]=mean(xstar)
-    }    
-  } else if (type=="median")
-  {
-    for (i in 1:B)
-    {
-      xstar=sample(x,replace=TRUE)
-      tstar[i]=median(xstar)
-    }
-  }
-  tstar025=quantile(tstar,0.025)
-  tstar975=quantile(tstar,0.975)
-  c(2*t1-tstar975,2*t1-tstar025)
+# # Create table of means and medians
+# data_summary = matrix(c(mean(light1879), median(light1879),
+#                         mean(light1882), median(light1882),
+#                         mean(light), median(light)),
+#                       ncol=2,byrow=TRUE)
+# colnames(data_summary) = c("Mean", "Median")
+# rownames(data_summary) = c("light1879", "light1882", "light")
+# data_summary = as.table(data_summary)
+# data_summary
+
+# for means
+
+B=1000
+T1 = mean(light1879)
+d = light1879
+Tstar=numeric(B)
+for(i in 1:B){
+  Xstar=sample(d,replace=TRUE)
+  Tstar[i]=median(Xstar)
 }
 
-# Determine confidence intervals
-
-conf_int(light1879, type="mean")
-conf_int(light1879, type="median")
-
-conf_int(light1882, type="mean")
-conf_int(light1882, type="median")
-
-conf_int(light, type="mean")
-conf_int(light, type="median")
+Tstar25=quantile(Tstar,0.025)
+Tstar975=quantile(Tstar,0.975)
+sum(Tstar<Tstar25)
+T1 = mean(d)
+c(2*T1-Tstar975,2*T1-Tstar25)
 
 
+B=1000
+T1 = mean(light1882)
+d = light1882
+Tstar=numeric(B)
+for(i in 1:B){
+  Xstar=sample(d,replace=TRUE)
+  Tstar[i]=median(Xstar)
+}
+
+Tstar25=quantile(Tstar,0.025)
+Tstar975=quantile(Tstar,0.975)
+sum(Tstar<Tstar25)
+T1 = mean(d)
+c(2*T1-Tstar975,2*T1-Tstar25)
+
+
+B=1000
+T1 = mean(light)
+d = light
+Tstar=numeric(B)
+for(i in 1:B){
+  Xstar=sample(d,replace=TRUE)
+  Tstar[i]=median(Xstar)
+}
+
+Tstar25=quantile(Tstar,0.025)
+Tstar975=quantile(Tstar,0.975)
+sum(Tstar<Tstar25)
+T1 = mean(d)
+c(2*T1-Tstar975,2*T1-Tstar25)
+
+
+
+# for median 
+
+
+B=1000
+T1 = median(light1879)
+d = light1879
+Tstar=numeric(B)
+for(i in 1:B){
+  Xstar=sample(d,replace=TRUE)
+  Tstar[i]=median(Xstar)
+}
+
+Tstar25=quantile(Tstar,0.025)
+Tstar975=quantile(Tstar,0.975)
+sum(Tstar<Tstar25)
+T1 = mean(d)
+c(2*T1-Tstar975,2*T1-Tstar25)
+
+
+B=1000
+T1 = median(light1882)
+d = light1882
+Tstar=numeric(B)
+for(i in 1:B){
+  Xstar=sample(d,replace=TRUE)
+  Tstar[i]=median(Xstar)
+}
+
+Tstar25=quantile(Tstar,0.025)
+Tstar975=quantile(Tstar,0.975)
+sum(Tstar<Tstar25)
+T1 = mean(d)
+c(2*T1-Tstar975,2*T1-Tstar25)
+
+
+B=1000
+T1 = median(light)
+d = light
+Tstar=numeric(B)
+for(i in 1:B){
+  Xstar=sample(d,replace=TRUE)
+  Tstar[i]=median(Xstar)
+}
+
+Tstar25=quantile(Tstar,0.025)
+Tstar975=quantile(Tstar,0.975)
+sum(Tstar<Tstar25)
+T1 = mean(d)
+c(2*T1-Tstar975,2*T1-Tstar25)
 
 ```
 
 ####3. Comment on the intervals found.
+
 ####4. Find on the internet the currently most accurate value for the speed of light. Is it consistent with the measurements of Michelson and Newcomb?
 
 
