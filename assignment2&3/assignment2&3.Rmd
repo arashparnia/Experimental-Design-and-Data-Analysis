@@ -138,21 +138,8 @@ boxplot(light)
 
 ####2. Determine confidence intervals for the speed of light in km/sec for all three data sets (use population means and medians).
 ```{r}
-
-
-
-# # Create table of means and medians
-# data_summary = matrix(c(mean(light1879), median(light1879),
-#                         mean(light1882), median(light1882),
-#                         mean(light), median(light)),
-#                       ncol=2,byrow=TRUE)
-# colnames(data_summary) = c("Mean", "Median")
-# rownames(data_summary) = c("light1879", "light1882", "light")
-# data_summary = as.table(data_summary)
-# data_summary
-
 # for means
-
+mean(light1879)
 B=1000
 T1 = mean(light1879)
 d = light1879
@@ -168,7 +155,7 @@ sum(Tstar<Tstar25)
 T1 = mean(d)
 c(2*T1-Tstar975,2*T1-Tstar25)
 
-
+mean(light1882)
 B=1000
 T1 = mean(light1882)
 d = light1882
@@ -184,7 +171,7 @@ sum(Tstar<Tstar25)
 T1 = mean(d)
 c(2*T1-Tstar975,2*T1-Tstar25)
 
-
+mean(light)
 B=1000
 T1 = mean(light)
 d = light
@@ -204,7 +191,7 @@ c(2*T1-Tstar975,2*T1-Tstar25)
 
 # for median 
 
-
+median(light1879)
 B=1000
 T1 = median(light1879)
 d = light1879
@@ -220,7 +207,7 @@ sum(Tstar<Tstar25)
 T1 = mean(d)
 c(2*T1-Tstar975,2*T1-Tstar25)
 
-
+median(light1882)
 B=1000
 T1 = median(light1882)
 d = light1882
@@ -236,7 +223,7 @@ sum(Tstar<Tstar25)
 T1 = mean(d)
 c(2*T1-Tstar975,2*T1-Tstar25)
 
-
+median(light)
 B=1000
 T1 = median(light)
 d = light
@@ -257,6 +244,7 @@ c(2*T1-Tstar975,2*T1-Tstar25)
 ####3. Comment on the intervals found.
 
 ####4. Find on the internet the currently most accurate value for the speed of light. Is it consistent with the measurements of Michelson and Newcomb?
+speed of light is  299792458 m / s and  299792.458 kps
 
 
 1
@@ -349,31 +337,31 @@ run_before <- run_before[!is.na(run_before)]
 # run = read.table('run.txt',header = FALSE)
 run_before
 
-## Pre-processing
-run = read.table("run.txt", header=TRUE)
-lemo = subset(run,drink=="lemo")[,-c(3)]
-energy = subset(run,drink=="energy")[,-c(3)]
-
-## Exercise 2.1 ##
-summary(run)
-boxplot(run[,-c(3)])
-
-par(mfrow=c(1,1))
-boxplot(lemo, ylim=c(6.3,9))
-boxplot(energy, ylim=c(6.3,9))
-
-par(mfrow=c(2,2))
-qqnorm(lemo$before,main="Normal Q-Q Plot lemo (before)",
-       ylab="Quantiles lemo (before)")
-qqnorm(lemo$after,main="Normal Q-Q Plot lemo (after)",
-       ylab="Quantiles lemo (after)")
-qqnorm(energy$before,main="Normal Q-Q Plot energy (before)",
-       ylab="Quantiles energy (before)")
-qqnorm(energy$after,main="Normal Q-Q Plot energy (after)",
-       ylab="Quantiles energy (after)")
-
-
-
+# ## Pre-processing
+# run = read.table("run.txt", header=TRUE)
+# lemo = subset(run,drink=="lemo")[,-c(3)]
+# energy = subset(run,drink=="energy")[,-c(3)]
+# 
+# ## Exercise 2.1 ##
+# summary(run)
+# boxplot(run[,-c(3)])
+# 
+# par(mfrow=c(1,1))
+# boxplot(lemo, ylim=c(6.3,9))
+# boxplot(energy, ylim=c(6.3,9))
+# 
+# par(mfrow=c(2,2))
+# qqnorm(lemo$before,main="Normal Q-Q Plot lemo (before)",
+#        ylab="Quantiles lemo (before)")
+# qqnorm(lemo$after,main="Normal Q-Q Plot lemo (after)",
+#        ylab="Quantiles lemo (after)")
+# qqnorm(energy$before,main="Normal Q-Q Plot energy (before)",
+#        ylab="Quantiles energy (before)")
+# qqnorm(energy$after,main="Normal Q-Q Plot energy (after)",
+#        ylab="Quantiles energy (after)")
+# 
+# 
+# 
 
 
 
@@ -431,61 +419,61 @@ the conclusion under part 2.
 dogs <- read.table("dogs(2).txt", header=TRUE, quote="\"")
 View(dogs)
 
-par(mfrow=c(1,3))
-
-# Create boxplots of all 3 variables
-boxplot(dogs$isofluorane, xlab="Isofluorane")
-boxplot(dogs$halothane, xlab="Halothane")
-boxplot(dogs$cyclopropane, xlab="Cyclopropane")
-
-par(mfrow=c(1,2))
-
-# Create QQ-plots of Isofluorane and normal distribution
-qqnorm(dogs$isofluorane, xlab="sample", main="QQ-plot Isofluorane")
-qqnorm(rnorm(length(dogs$isofluorane)), xlab="random", main="QQ-plot Isofluorane")
-
-
-# Create QQ-plots of Halothane and normal distribution
-qqnorm(dogs$halothane, xlab="sample", main="QQ-plot Halothane")
-qqnorm(rnorm(length(dogs$halothane)), xlab="random", main="QQ-plot Halothane")
-
-# Create QQ-plots of Cycloprane and normal distribution
-qqnorm(dogs$cyclopropane, xlab="sample", main="QQ-plot Cyclopropane")
-qqnorm(rnorm(length(dogs$cyclopropane)), xlab="random", main="QQ-plot Cyclopropane")
-
-
-
-
-
-# Create a data frame for isofluorane
-dogsframeiso = dogs[,-c(2,3)]
-dogsframeiso = data.frame(iso=as.vector(as.matrix(dogs)), group1=as.factor(rep(1:1,each=10)))
-dogsframeiso[1:10,]
-
-# Perform Kruskal Wallis test isofluorane
-is.factor(dogsframeiso$group); is.numeric(dogsframeiso$group)
-attach(dogsframeiso)
-kruskal.test(iso,group1)
-
-# Create a data frame for halothane
-dogsframehalo = dogs[,-c(1,3)]
-dogsframehalo = data.frame(halo=as.vector(as.matrix(dogs)), group2=as.factor(rep(1:3,each=10)))
-dogsframehalo[12:21,]
-
-# Perform Kruskal Wallis test halothane
-is.factor(dogsframehalo$group); is.numeric(dogsframehalo$group)
-attach(dogsframehalo)
-kruskal.test(halo,group2)
-
-# Create a data frame for cyclopropane
-dogsframecyclo = dogsframecyclo[,-c(1,2)]
-dogsframecyclo = data.frame(cyclo=as.vector(as.matrix(dogs)), group3=as.factor(rep(1:3,each=10)))
-dogsframecyclo[22:30,]
-
-# Perform Kruskal Wallis test isofluorane
-is.factor(dogsframecyclo$group); is.numeric(dogsframecyclo$group)
-attach(dogsframecyclo)
-kruskal.test(cyclo,group3)
+# par(mfrow=c(1,3))
+# 
+# # Create boxplots of all 3 variables
+# boxplot(dogs$isofluorane, xlab="Isofluorane")
+# boxplot(dogs$halothane, xlab="Halothane")
+# boxplot(dogs$cyclopropane, xlab="Cyclopropane")
+# 
+# par(mfrow=c(1,2))
+# 
+# # Create QQ-plots of Isofluorane and normal distribution
+# qqnorm(dogs$isofluorane, xlab="sample", main="QQ-plot Isofluorane")
+# qqnorm(rnorm(length(dogs$isofluorane)), xlab="random", main="QQ-plot Isofluorane")
+# 
+# 
+# # Create QQ-plots of Halothane and normal distribution
+# qqnorm(dogs$halothane, xlab="sample", main="QQ-plot Halothane")
+# qqnorm(rnorm(length(dogs$halothane)), xlab="random", main="QQ-plot Halothane")
+# 
+# # Create QQ-plots of Cycloprane and normal distribution
+# qqnorm(dogs$cyclopropane, xlab="sample", main="QQ-plot Cyclopropane")
+# qqnorm(rnorm(length(dogs$cyclopropane)), xlab="random", main="QQ-plot Cyclopropane")
+# 
+# 
+# 
+# 
+# 
+# # Create a data frame for isofluorane
+# dogsframeiso = dogs[,-c(2,3)]
+# dogsframeiso = data.frame(iso=as.vector(as.matrix(dogs)), group1=as.factor(rep(1:1,each=10)))
+# dogsframeiso[1:10,]
+# 
+# # Perform Kruskal Wallis test isofluorane
+# is.factor(dogsframeiso$group); is.numeric(dogsframeiso$group)
+# attach(dogsframeiso)
+# kruskal.test(iso,group1)
+# 
+# # Create a data frame for halothane
+# dogsframehalo = dogs[,-c(1,3)]
+# dogsframehalo = data.frame(halo=as.vector(as.matrix(dogs)), group2=as.factor(rep(1:3,each=10)))
+# dogsframehalo[12:21,]
+# 
+# # Perform Kruskal Wallis test halothane
+# is.factor(dogsframehalo$group); is.numeric(dogsframehalo$group)
+# attach(dogsframehalo)
+# kruskal.test(halo,group2)
+# 
+# # Create a data frame for cyclopropane
+# dogsframecyclo = dogsframecyclo[,-c(1,2)]
+# dogsframecyclo = data.frame(cyclo=as.vector(as.matrix(dogs)), group3=as.factor(rep(1:3,each=10)))
+# dogsframecyclo[22:30,]
+# 
+# # Perform Kruskal Wallis test isofluorane
+# is.factor(dogsframecyclo$group); is.numeric(dogsframecyclo$group)
+# attach(dogsframecyclo)
+# kruskal.test(cyclo,group3)
 
 
 ```
