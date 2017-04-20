@@ -134,12 +134,16 @@ klm = c(klm$V1,klm$V2,klm$V3,klm$V4,klm$V5)
 par(mfrow=c(1,2))
 hist(klm)
 boxplot(klm)
+summary(klm)
+library(BSDA)
+p <- SIGN.test(klm , md = 32)
+p
 
 ```
 
 ####2. KLM is willing to accept that (on average over a long period) at most 10% of the parts arrives after the maximum delivery period of 70 days. Design a test analogously to the sign test to check whether this criterium is met. Perform this test on the KLM data.
 ```{r}
-
+wilcox.test(klm,mu=70)
 ```
 
 ##EXERCISE 4
@@ -153,9 +157,11 @@ rainfall in feet per acre) of seeded and unseeded clouds.
 ```{r}
 clouds = read.table('clouds.txt',header = FALSE)
 par(mfrow=c(1,3))
-plot(V1~V2,data=clouds); abline(0,1)
+# plot(V1~V2,data=clouds); abline(0,1)
 # boxplot(clouds$V1)
 # boxplot(clouds[,1]-clouds[,2])
+
+clouds = clouds(2,end(clouds))
 ```
 ####2. Repeat the same procedure on the square root of the values in clouds.txt. Comment on your findings.
 ####3. Repeat the same procedure on the square root of the square root of the values in clouds. Comment on your findings.
@@ -210,6 +216,57 @@ run_before
 # plot(run$V2,peruvians$V6);
 # boxplot(clouds$V1)
 # boxplot(clouds[,1]-clouds[,2])
+
+
+#############################
+# Assignment 3 - Exercise 2 #
+#############################
+
+## Pre-processing
+run = read.table("input/run.txt", header=TRUE)
+lemo = subset(run,drink=="lemo")[,-c(3)]
+energy = subset(run,drink=="energy")[,-c(3)]
+
+## Exercise 2.1 ##
+summary(run)
+boxplot(run[,-c(3)])
+
+par(mfrow=c(1,1))
+boxplot(lemo, ylim=c(6.3,9))
+boxplot(energy, ylim=c(6.3,9))
+
+par(mfrow=c(2,2))
+qqnorm(lemo$before,main="Normal Q-Q Plot lemo (before)",
+       ylab="Quantiles lemo (before)")
+qqnorm(lemo$after,main="Normal Q-Q Plot lemo (after)",
+       ylab="Quantiles lemo (after)")
+qqnorm(energy$before,main="Normal Q-Q Plot energy (before)",
+       ylab="Quantiles energy (before)")
+qqnorm(energy$after,main="Normal Q-Q Plot energy (after)",
+       ylab="Quantiles energy (after)")
+
+## Exercise 2.2 ##
+summary(lemo);
+t.test(lemo$before, lemo$after);
+
+summary(energy);
+t.test(energy$before, energy$after);
+
+## Exercise 2.3 ##
+run$diff = run$after - run$before
+diff_lemo = subset(run,drink=="lemo")$diff
+diff_energy = subset(run,drink=="energy")$diff
+
+mean(run$diff);mean(diff_lemo);mean(diff_energy)
+t.test(diff_lemo, diff_energy)
+
+## Exercise 2.6 ##
+par(mfrow=c(1,2))
+qqnorm(diff_lemo,main="Normal Q-Q Plot time diff lemo",
+       ylab="Quantiles time diff lemo")
+qqnorm(diff_energy,main="Normal Q-Q Plot time diff energy",
+       ylab="Quantiles time diff energy")
+
 
 ```
 ####2. Test separately, for both the softdrink and the energy drink conditions, whether there is a difference in speed in the two running tasks.
