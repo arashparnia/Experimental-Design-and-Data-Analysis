@@ -1,5 +1,7 @@
 ---
-title: "R Notebook"
+title: "Assignment 2, EDDA 2017"
+author: "Fabio Curi Paixao (2592802) Arash Parnia (2591051) - Group 22"
+date: "19 April 2017"
 output: html_notebook
 ---
 
@@ -13,7 +15,6 @@ In the present document, the results for the second and third assignment of the 
 be performed using a level of 0.05, unless otherwise specified.
 
 ###EXERCISE 1
-
 
 #### 1. Test whether the data in telephone.txt stems from the exponential distribution Exp(λ) with λ = 0.035, by performing a bootstrap test using the test statistic T(X1, . . . , XN ) = median(X1, . . . , XN ).
 ```{r}
@@ -58,13 +59,9 @@ hist(Tstar,prob=T1,main="Tstar")
 ####1. Make histograms and box plots of the data sets. What do you observe?
 First of all, we will make the adjusments necessary for the three databases to be able to be compared. These adjustments are needed since the measurement procedures between both scientists were different.
 ```{r}
-# light1879 = read.delim('light1879.txt',sep = "",header = FALSE)
-# light1882 = read.delim('light1882.txt',sep = "",header = FALSE)
-# light = read.delim('light.txt',sep = "",header = FALSE)
-
-light1879 = scan(file="light1879.txt")
-light1882 = scan(file="light1882.txt")
-light = scan(file="light.txt")
+light1879 = scan(file="light1879.txt");
+light1882 = scan(file="light1882.txt");
+light = scan(file="light.txt");
 
 light = light/1000  + 24.8
 
@@ -101,11 +98,6 @@ par(mfrow=c(1,3))
 boxplot(light1879)
 boxplot(light1882)
 boxplot(light)
-#l1 = as.numeric(levels(light1879))[light1879]
-
-
-
-
 
 ```
 
