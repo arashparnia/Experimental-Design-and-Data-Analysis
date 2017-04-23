@@ -1,13 +1,8 @@
 ---
-title: "Assignment 2, EDDA 2017"
-author: "Fabio Curi Paixao (2592802) Arash Parnia (2591051) - Group 22"
-date: "19 April 2017"
-output:
-  pdf_document: default
-  word_document: default
-highlight: tango
-fontsize: 11pt
+title: "R Notebook"
+output: html_notebook
 ---
+
 
 ***
 ## Introduction
@@ -19,10 +14,6 @@ be performed using a level of 0.05, unless otherwise specified.
 
 ###EXERCISE 1
 
-A telecommunication company has entered the market for mobile phones in
-a new country. The companys marketing manager conducts a survey of 200
-new subscribers for mobile phones. The data of her survey are in the data set
-telephone.txt, which contains the first months bills.
 
 #### 1. Test whether the data in telephone.txt stems from the exponential distribution Exp(λ) with λ = 0.035, by performing a bootstrap test using the test statistic T(X1, . . . , XN ) = median(X1, . . . , XN ).
 ```{r}
@@ -64,26 +55,6 @@ hist(Tstar,prob=T1,main="Tstar")
 
 ##EXERCISE 2
 
-In 1849 and 1850, the French physicists Fizeau and Foucault had separately devised
-methods of measuring the velocity of light. Foucault’s method, as refined
-and improved by Newcomb and Michelson, was the source of the more accurate
-subsequent determinations. Foucault’s method consists in essence of passing
-light from a source off a rapidly rotating mirror to a distant fixed mirror, and
-back to the rotating mirror. The velocity of light is then determined by measuring
-the distance involved, the speed of the rotating mirror and the angular
-displacement of the received image from its source.
-
-In 1879 Michelson performed 100 experiments to determine the speed of
-light and in 1882 another 23 experiments. The measurements in km/sec minus
-299000 are given in the file light1879.txt and light1882.txt, respectively.
-
-The file light.txt contains Newcomb’s measurements (made in 1882 on three
-different days: the first 20 measurements on day 1, the next 20 onday 2, the last
-26 on day 3) of the passage time it took light to travel the distance 7.442 km,
-
-The coding of Newcomb’s measurements is as follows: from the original times
-in microseconds measured by Newcomb first 24.8 was subtracted, after which
-the results were multiplied with 1000.
 ####1. Make histograms and box plots of the data sets. What do you observe?
 First of all, we will make the adjusments necessary for the three databases to be able to be compared. These adjustments are needed since the measurement procedures between both scientists were different.
 ```{r}
@@ -252,12 +223,9 @@ c(2*T1-Tstar975,2*T1-Tstar25)
 speed of light is  299792458 m / s and  299792.458 kps
 
 
-1
+
 ##EXERCISE 3
 
-The file klm.txt contains the delivery durations (in days) of aircraft parts delivered
-by Boeing to KLM (you can use scan to read this file). The maximum
-delivery duration of these parts is 70 days.
 ####1. Test (using an appropriate test) the null hypothesis that the median duration µ is smaller or equal to 32 days against the alternative hypothesis that this median is greater than 32 days. Motivate your choice of test.
 
 We will now test the null hypothesis that the median duration is smaller or equal to 32 days against the alternative hypothesis that this median is greater than 32 days.
@@ -280,12 +248,6 @@ wilcox.test(klm,mu=70)
 ```
 
 ##EXERCISE 4
-
-To improve rain fall in dry areas, an experiment was carried out with 52 clouds.
-Scientists investigated whether the addition of silver nitrate has an effect on
-rainfall. They chose 26 out of a sample of 52 clouds and seeded it with silver
-nitrate. The file clouds.txt contains the precipitation values (records the
-rainfall in feet per acre) of seeded and unseeded clouds.
 ####1. Test whether silver nitrate has an effect by performing three tests: the two samples t-test (argue whether the data are paired or not), the MannWhitney test and the Kolmogorov-Smirnov test. Indicate whether these tests are applicable for our research question. Comment on your findings.
 To see if there was an improvement, deterioration, or if the means of times have remained substantially the same (hypothesis H0), we need to make a Student’s t-test for paired samples:
 ```{r}
@@ -362,18 +324,10 @@ Now, the values for the t.test dropped from 0.01278 to 0.008811; for the Wilcoxo
 ***
 
 #Assignment 3
-
-This assignment consists of 3 exercises. Throughout this assignment tests should
 be performed using a level of 0.05, unless otherwise specified.
 
 ##EXERCISE 1
 
-The file peruvians.txt contains the data of Peruvian men after migrating to
-a modern society (see lecture 3). The column migration displays the years
-since migration and column wrist contains the heart rate. Neglect the columns
-chin, arm and calf for this exercise (use e.g. peruvians[,-c(5,6,7)]). The
-meaning of the remaining columns is given by their names. In this exercise we
-want to investigate which variables are related to the years since migration.
 ####1. Use pairs to make plots of each pair of two variables. Based on this picture, which variables do you expect to correlate (in rank) with migration?
 We obtain the pairs plot for the correlation between variables age (V1), weight (V3), length (V4), wrist (V8), systolic (V9) and diastolic (V10) with migration (V2). The area of interest is concentrated on the second row, and also second column. From this plot, we decided that only the variable "age" would be correlated to "migration", as it is the only which seemly respects an uprising behaviour, as in the oldest the person is, the longest he/she would be expected to having been under the status of migrant. 
 
@@ -423,11 +377,6 @@ By the numbers here above, we can confirm what was before stated that the variab
 ***
 ##EXERCISE 2
 
-To study the effect of energy drink a sample of 24 high school pupils were
-randomized to drinking either a softdrink or an energy drink after running for
-60 meters. After half an hour they were asked to run again. For both sprints they
-were asked to sprint as fast they could, and the sprinting time was measured.
-The data is given in the file run.txt.
 ####1. Study the data and make a few graphical representations.
 The best way to represent this data is through separating it into two different datasets: one for "lemo" and another for "energy".
 ```{r}
@@ -476,13 +425,9 @@ qqnorm(difference_energy)
 ```
 
 ***
-
+#todo check every part 
 ##EXERCISE 3
 
-The concentrations (in nanograms per millimeter) of plasma epinephrine were
-measured for 10 dogs under isofluorane, halothane, and cyclopropane anesthesia.
-The measurements are given in dogs.txt. We are interested in differences in
-the concentration for the different drugs.
 ####1. Make boxplots of the 3 samples. Make QQ-plots of the 3 samples against the normal distribution (a separate plot for each of the drugs). Is it reasonable to assume that these samples were taken from normal populations?
 ```{r}
 dogs <- read.table("dogs(2).txt", header=TRUE)
@@ -495,37 +440,29 @@ boxplot(dogs$cyclopropane,xlab="cyclopropane")
 
 par(mfrow=c(1,2))
 
+qqnorm(dogs$isofluorane, xlab="sample", main="Isofluorane")
+qqnorm(rnorm(length(dogs$isofluorane)), xlab="random", main="Isofluorane random")
 
-qqnorm(dogs$isofluorane, xlab="sample", main="QQ-plot isofluorane samples")
-qqnorm(rnorm(length(dogs$isofluorane)), xlab="random", main="QQ-plot Isofluorane random")
+qqnorm(dogs$halothane, xlab="sample", main="Halothane")
+qqnorm(rnorm(length(dogs$halothane)), xlab="random", main="Halothane random")
 
-
-
-qqnorm(dogs$halothane, xlab="sample", main="QQ-plot halothane samples")
-qqnorm(rnorm(length(dogs$halothane)), xlab="random", main="QQ-plot Halothane random")
-
-
-qqnorm(dogs$cyclopropane, xlab="sample", main="QQ-plot cyclopropane samples ")
-qqnorm(rnorm(length(dogs$cyclopropane)), xlab="random", main="QQ-plot Cyclopropane random")
-
-
-
+qqnorm(dogs$cyclopropane, xlab="sample", main="Cyclopropane")
+qqnorm(rnorm(length(dogs$cyclopropane)), xlab="random", main="Cyclopropane random")
 
 
 ```
 ####2. Test the null hypothesis that the concentration is the same under the different drugs using normal theory. Give the estimated concentration of plasma epinephrine for each of the three anesthesia drugs.
 
+
 ####3. Perform the Kruskal-Wallis test for the same null hypothesis. What is the conclusion here? Explain possible differences between this conclusion and the conclusion under part 2.
+First we create data frames as numeric and factor.
 ```{r}
-# Create a data frame for isofluorane
 dogsframeiso = dogs[,-c(2,3)]
 isofluorane=as.vector(as.matrix(dogs))
 group1=as.factor(as.numeric(rep(1:1,each=10)))
 dogsframeiso = data.frame(isofluorane, group1)
 dogsframeiso[1:10,]
 
-
-# Create a data frame for halothane
 dogsframehalo = dogs[,-c(1,3)]
 halothane=as.vector(as.matrix(dogs))
 group2=as.factor(as.numeric(rep(1:3,each=10)))
@@ -533,28 +470,19 @@ dogsframehalo = data.frame(halothane,group2)
 dogsframehalo[12:21,]
 
 
-# Create a data frame for cyclopropane
 dogsframecyclo = dogs[,-c(1,2)]
 cyclopropane=as.vector(as.matrix(dogs))
 group3=as.factor(as.numeric(rep(1:3,each=10)))
 dogsframecyclo = data.frame(cyclopropane,group3)
 dogsframecyclo[22:30,]
+```
+then we perfom Kruskal Wallis test on isofluorane,halothane and cyclopropane
+```{r}
 
-
-
-# Perform Kruskal Wallis test isofluorane
-is.factor(dogsframeiso$group)
-is.numeric(dogsframeiso$group)
 kruskal.test(dogsframeiso,group1)
 
-# # Perform Kruskal Wallis test halothane
-is.factor(dogsframehalo$group);
-is.numeric(dogsframehalo$group)
 kruskal.test(halothane,group2)
 
-# # Perform Kruskal Wallis test isofluorane
-is.factor(dogsframecyclo$group);
-is.numeric(dogsframecyclo$group)
 kruskal.test(cyclopropane,group3)
 
 ```
