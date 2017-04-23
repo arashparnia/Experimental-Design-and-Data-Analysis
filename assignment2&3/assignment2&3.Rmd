@@ -25,9 +25,6 @@ new subscribers for mobile phones. The data of her survey are in the data set
 telephone.txt, which contains the first months bills.
 
 #### 1. Test whether the data in telephone.txt stems from the exponential distribution Exp(λ) with λ = 0.035, by performing a bootstrap test using the test statistic T(X1, . . . , XN ) = median(X1, . . . , XN ).
-
-#### 2. Make an appropriate plot of this data set. What information can be extracted from these data? What marketing advice would you give to the marketing manager?
-
 ```{r}
 telephone = read.table('telephone.txt')
 d <- as.numeric(levels(telephone$V1))[telephone$V1]
@@ -35,17 +32,11 @@ d <- d[!is.na(d)]
 
 shapiro.test(d)
 hist(d)
-
-```
-
-```{r}
 # m = Filter(is.numeric, mydata)
 # length(d) # number of elements or components
 # str(d)    # structure of an object
 # class(d)  # class or type of an object
 # names(d)  # names
-
-
 
 B=1000
 Tstar=numeric(B)
@@ -60,8 +51,14 @@ sum(Tstar<Tstar25)
 T1 = mean(d)
 c(2*T1-Tstar975,2*T1-Tstar25)
 
-
+hist(Tstar,prob=T1,main="Tstar")
 ```
+
+#### 2. Make an appropriate plot of this data set. What information can be extracted from these data? What marketing advice would you give to the marketing manager?
+
+
+
+
 
 
 ##EXERCISE 2
@@ -87,6 +84,7 @@ The coding of Newcomb’s measurements is as follows: from the original times
 in microseconds measured by Newcomb first 24.8 was subtracted, after which
 the results were multiplied with 1000.
 ####1. Make histograms and box plots of the data sets. What do you observe?
+First of all, we will make the adjusments necessary for the three databases to be able to be compared. These adjustments are needed since the measurement procedures between both scientists were different.
 ```{r}
 # light1879 = read.delim('light1879.txt',sep = "",header = FALSE)
 # light1882 = read.delim('light1882.txt',sep = "",header = FALSE)
@@ -102,7 +100,6 @@ light = 7.442 * 1000 /light
 light = light * 1000
  
 light  = light -299000
-
 
 # light1879 <- c(light1879$V1,light1879$V2,light1879$V3,light1879$V4,light1879$V5)
 # light1882 <- c(light1882$V1,light1882$V2,light1882$V3,light1882$V4,light1882$V5)
@@ -140,7 +137,10 @@ boxplot(light)
 
 ```
 
+As it can be seen from the boxplots, there is a significant difference between the measurements made in 1879 by Michelson in 1879 and 1882 and from Newcomb's measurements from 1882. The median values of the boxplots are considerably different between the former and these two last. Furthermore, between the two measurements from 1882, Newcomb managed to obtain his results in a fairly narrower amplitude, which is maybe thanks to his methodology and/or equipments used.
+
 ####2. Determine confidence intervals for the speed of light in km/sec for all three data sets (use population means and medians).
+Here, we will make use of both mean and median values of each dataset. We have created a function to take into account this choice. The results are given right after.
 ```{r}
 # for means
 mean(light1879)
@@ -258,6 +258,8 @@ The file klm.txt contains the delivery durations (in days) of aircraft parts del
 by Boeing to KLM (you can use scan to read this file). The maximum
 delivery duration of these parts is 70 days.
 ####1. Test (using an appropriate test) the null hypothesis that the median duration µ is smaller or equal to 32 days against the alternative hypothesis that this median is greater than 32 days. Motivate your choice of test.
+
+We will now test the null hypothesis that the median duration is smaller or equal to 32 days against the alternative hypothesis that this median is greater than 32 days.
 ```{r}
 klm = read.table('klm.txt')
 klm = c(klm$V1,klm$V2,klm$V3,klm$V4,klm$V5)
@@ -284,17 +286,79 @@ rainfall. They chose 26 out of a sample of 52 clouds and seeded it with silver
 nitrate. The file clouds.txt contains the precipitation values (records the
 rainfall in feet per acre) of seeded and unseeded clouds.
 ####1. Test whether silver nitrate has an effect by performing three tests: the two samples t-test (argue whether the data are paired or not), the MannWhitney test and the Kolmogorov-Smirnov test. Indicate whether these tests are applicable for our research question. Comment on your findings.
+To see if there was an improvement, deterioration, or if the means of times have remained substantially the same (hypothesis H0), we need to make a Student’s t-test for paired samples:
 ```{r}
-clouds = read.table('clouds.txt',header = FALSE)
-par(mfrow=c(1,3))
+# clouds = read.table('clouds.txt',header = FALSE)
+# par(mfrow=c(1,3))
 # plot(V1~V2,data=clouds); abline(0,1)
 # boxplot(clouds$V1)
 # boxplot(clouds[,1]-clouds[,2])
 
-clouds = clouds(2,end(clouds))
+clouds = read.table('clouds.txt',header = FALSE)
+a=as.numeric(levels(clouds$V1))[clouds$V1]
+a=a[2:end(a)]
+b=as.numeric(levels(clouds$V2))[clouds$V2]
+b=b[2:end(b)]
+
 ```
+
+To see if there was an improvement, deterioration, or if the means of times have remained substantially the same (hypothesis H0), we need to make a Student’s t-test for paired samples:
+```{r}
+t.test(a,b, paired=TRUE)
+```
+Here, we asked R to check whether the mean of the values contained in the vector a is equal to the mean of the values contained in the vector b, thus checking whether there has not been any improvement/nor worsening in the amount of rainfall after seeding (H0).
+The p-value is just above 0.05, we do not reject the null hypothesis.
+
+Then, we perform Mann-Whitney test and the Kolmogorov-Smirnov test.
+
+```{r}
+print(wilcox.test(a,b,paired=TRUE) )
+```
+The null hypothesis is that the rainfall of the two sample unseeded and seeded clouds are identical populations. As the p-value turns out to be 0.006131, and is less than the .05 significance level, we reject the null hypothesis.
+
+```{r}
+print(ks.test(a,b,paired=TRUE))
+```
+
+
+Here, the same conclusion can be made, as the p-value for is below 0.05. In the present case, applying these three tests might not be applicable, as it could be proved in practice that seeding clouds would be an improvement for the amount of rainfall. What is lacking here is maybe the inclusion of other variables important for such rise of rainfall, such as local temperature, wind, among others. Or simply, make use of other procedures to calculate an eventual evidence.
+
 ####2. Repeat the same procedure on the square root of the values in clouds.txt. Comment on your findings.
+
+
+Now, we will take the squared root of the values in the file.
+
+```{r}
+a_2=sqrt(a)
+b_2=sqrt(b)
+```
+
+```{r}
+t.test(a_2,b_2, paired=TRUE)
+wilcox.test(a_2,b_2,paired=TRUE) 
+ks.test(a_2,b_2,paired=TRUE)
+```
+
+The values for the t.test dropped from 0.05375 to 0.01278; for the Wilcoxon, it increased from 0.006131 to 0.01278, and for the Kolmogorov-Smirnov, it remained the same.
+
 ####3. Repeat the same procedure on the square root of the square root of the values in clouds. Comment on your findings.
+
+Finally, the squared root of the squared root of the values in the file are considered.
+
+```{r}
+a_3=sqrt(a_2)
+b_3=sqrt(b_2)
+```
+
+```{r}
+t.test(a_3,b_3, paired=TRUE)
+wilcox.test(a_3,b_3,paired=TRUE) 
+ks.test(a_3,b_3,paired=TRUE)
+```
+
+Now, the values for the t.test dropped from 0.01278 to 0.008811; for the Wilcoxon, it decreased from 0.01278 to 0.007291 (close to the first simulation - 0.006131), and for the Kolmogorov-Smirnov, it still remained the same.
+***
+***
 
 #Assignment 3
 
@@ -310,20 +374,52 @@ chin, arm and calf for this exercise (use e.g. peruvians[,-c(5,6,7)]). The
 meaning of the remaining columns is given by their names. In this exercise we
 want to investigate which variables are related to the years since migration.
 ####1. Use pairs to make plots of each pair of two variables. Based on this picture, which variables do you expect to correlate (in rank) with migration?
+We obtain the pairs plot for the correlation between variables age (V1), weight (V3), length (V4), wrist (V8), systolic (V9) and diastolic (V10) with migration (V2). The area of interest is concentrated on the second row, and also second column. From this plot, we decided that only the variable "age" would be correlated to "migration", as it is the only which seemly respects an uprising behaviour, as in the oldest the person is, the longest he/she would be expected to having been under the status of migrant. 
+
 ```{r}
-peruvians = read.table('peruvians.txt',header = FALSE)
+# peruvians = read.table('peruvians.txt',header = FALSE)
 # <!-- par(mfrow=c(1,3)) -->
 # plot(V2~V6,data=peruvians); abline(0,1)
 # names(peruvians);
-plot(peruvians$V2,peruvians$V6);
+# plot(peruvians$V2,peruvians$V6);
 # boxplot(clouds$V1)
 # boxplot(clouds[,1]-clouds[,2])
+peruvians = read.table('peruvians.txt')
+peruvians = peruvians[,-c(5,6,7)]
+pairs(peruvians)
 
 ```
 
 
 ####2. Perform a test for each of the variables to test the rank correlation between that variable and migration. Give your conclusions of each test separately.
 
+```{r}
+age=as.numeric(levels(peruvians$V1))[peruvians$V1]
+age=age[2:end(age)]
+migration=as.numeric(levels(peruvians$V2))[peruvians$V2]
+migration=migration[2:end(migration)]
+weight=as.numeric(levels(peruvians$V3))[peruvians$V3]
+weight=weight[2:end(weight)]
+length=as.numeric(levels(peruvians$V4))[peruvians$V4]
+length=length[2:end(length)]
+wrist=as.numeric(levels(peruvians$V8))[peruvians$V8]
+wrist=wrist[2:end(wrist)]
+systolic=as.numeric(levels(peruvians$V9))[peruvians$V9]
+systolic=systolic[2:end(systolic)]
+diastolic=as.numeric(levels(peruvians$V10))[peruvians$V10]
+diastolic=diastolic[2:end(diastolic)]
+```
+```{r}
+cor(age,migration)
+cor(weight,migration)
+cor(length,migration)
+cor(wrist,migration)
+cor(systolic,migration)
+cor(diastolic,migration)
+```
+By the numbers here above, we can confirm what was before stated that the variable which is most likely to be correlated to migration is age. The other variables had a very low or even negative values. The variable "weight" had correlation of 0.4811, which is not as low as the others, however we can't consider here it being correlated to "migration" as this value is still low.
+
+***
 ##EXERCISE 2
 
 To study the effect of energy drink a sample of 24 high school pupils were
@@ -332,75 +428,53 @@ randomized to drinking either a softdrink or an energy drink after running for
 were asked to sprint as fast they could, and the sprinting time was measured.
 The data is given in the file run.txt.
 ####1. Study the data and make a few graphical representations.
+The best way to represent this data is through separating it into two different datasets: one for "lemo" and another for "energy".
 ```{r}
-run = read.delim('run.txt',sep = "",header = FALSE);
-run
-run_before <- as.numeric(run$V2)
-run_before
-run_before <- run_before[!is.na(run_before)] 
-# run = read.table('run.txt',header = FALSE)
-run_before
+run = read.table('run.txt')
+lemo = subset(run,drink=="lemo")[,-c(3)]
+energy = subset(run,drink=="energy")[,-c(3)]
 
-# ## Pre-processing
-# run = read.table("run.txt", header=TRUE)
-# lemo = subset(run,drink=="lemo")[,-c(3)]
-# energy = subset(run,drink=="energy")[,-c(3)]
-# 
-# ## Exercise 2.1 ##
-# summary(run)
-# boxplot(run[,-c(3)])
-# 
-# par(mfrow=c(1,1))
-# boxplot(lemo, ylim=c(6.3,9))
-# boxplot(energy, ylim=c(6.3,9))
-# 
-# par(mfrow=c(2,2))
-# qqnorm(lemo$before,main="Normal Q-Q Plot lemo (before)",
-#        ylab="Quantiles lemo (before)")
-# qqnorm(lemo$after,main="Normal Q-Q Plot lemo (after)",
-#        ylab="Quantiles lemo (after)")
-# qqnorm(energy$before,main="Normal Q-Q Plot energy (before)",
-#        ylab="Quantiles energy (before)")
-# qqnorm(energy$after,main="Normal Q-Q Plot energy (after)",
-#        ylab="Quantiles energy (after)")
-# 
-# 
-# 
+boxplot(run[,-c(3)])
 
-
-
-
-
+par(mfrow=c(1,1))
+boxplot(lemo)
+boxplot(energy)
 ```
 ####2. Test separately, for both the softdrink and the energy drink conditions, whether there is a difference in speed in the two running tasks.
 ```{r}
-summary(lemo);
 t.test(lemo$before, lemo$after);
 
-summary(energy);
 t.test(energy$before, energy$after);
 ```
+The results of the t.test show that, for those having drunk "lemo", the hypothesis H0 which states that the mean values before and after drinking the beverage are equal, is maintained as the p-value of 0.6203 is clearly higher than 0.05.
+For the beverage "energy", the p-value of 0.3407 maintains the hypothesis H0, however with lower value, which could suggest that, for instance, the energy could have made a difference in the overall performance.
 
 ####3. For each pupil compute the time difference between the two running tasks. Test whether these time differences are effected by the type of drink.
-```{r}
-run$diff = run$after - run$before
-diff_lemo = subset(run,drink=="lemo")$diff
-diff_energy = subset(run,drink=="energy")$diff
 
-mean(run$diff);mean(diff_lemo);mean(diff_energy)
-t.test(diff_lemo, diff_energy)
+```{r}
+run$difference = run$after - run$before
+difference_lemo = subset(run,drink=="lemo")$difference
+difference_energy = subset(run,drink=="energy")$difference
+
+t.test(difference_lemo, difference_energy)
 ```
+Effectively, even though the hypothesis H0 is not rejected here, the p-value is still low and the means of the differences for lemo and energy shown in the report state that there is a significant difference, specially for the latter one being negative. Thus, the time differences can be considered to be affected by the beverages.
 
 ####4. Can you think of a plausible objection to the design of the experiment if the main aim was to test whether drinking the energy drink speeds up the running?
+One objection would be, since it is expected that the energy drink takes some time to take effect in the pupils' metabolism, the data collected could have also considered that the same amount of beverage can be absorved differently by the pupils and thus, the results might end misleading or even not leading to any conclusion whatsoever.
+
+
 ####5. Is there a similar objection to the design relative to the analysis under 3)?
+For the same reasons, the metabolism of the pupils react differently. For instance, regardless of what beverage was consumed, a very slim and short person would not present a difference proportional to a chubbier person with more height, under normal circumstances. Thus, the height and the weight of the pupils could have been taken into account.
+
 ####6. The vector of differences in 3) has 24 elements. Which distributional assumption on these differences is needed for the analysis in 3)? How would you transform this vector into 24 residuals to investigate this assumption in QQ-plots? Make this QQ-plot(s).
 ```{r}
 par(mfrow=c(1,2))
-qqnorm(diff_lemo,main="Normal Q-Q Plot time diff lemo",
-       ylab="Quantiles time diff lemo")
-qqnorm(diff_energy,main="Normal Q-Q Plot time diff energy",
-       ylab="Quantiles time diff energy")
+qqnorm(difference_lemo)
+qqnorm(difference_energy)
 ```
+
+***
 
 ##EXERCISE 3
 
@@ -481,87 +555,3 @@ kruskal.test(dogsframeiso$,dogsframeiso)
 # kruskal.test(cyclo,group3)
 
 ```
-
-
-
-
-
-## Assignment 2
-
-### Exercise 1
-
-#### 1
-
-```{r}
-telephone = read.table('telephone.txt')
-telephone <- as.numeric(levels(telephone$V1))[telephone$V1]
-telephone <- telephone[!is.na(telephone)] 
-```
-
-#### 2
-
-
-```{r,fig.margin = TRUE,fig.width=6,fig.height=3}
-par(mfrow=c(1,2));
-hist(telephone); qqnorm(telephone)
-```
-
-
-### Exercise 2
-
-#### 1
-
-light1879 = read.table('light1879.txt')
-light1879 <- gsub(",", "", light1879)   # remove comma
-light1879 <- as.numeric(light1879)      # turn into numbers
-light1879 <- as.numeric(levels(light1879$V1))[light1879$V1]
-light1879 <- light1879[!is.na(light1879)]
-
-#### 2
-
-#### 3
-
-#### 4
-
-
-## Assignment 3
-
-#### 1
-
-```{r}
-peruvians = read.table('peruvians.txt')
-peruvians = peruvians[,-c(5,6,7)]
-pairs(peruvians)
-```
-
-We obtain the pairs plot for the correlation between variables V1, V3, V4, V8, V9 and V10 with V2. From this plot, we decided that only the variable "age" would be correlated to "migration", as it is the only which seemly respects an uprising behaviour, as in the oldest the person, the longest he/she has been under the status of migrator. 
-
-Now, we will study the correlation of these variables with "migration".
-
-```{r}
-age=as.numeric(levels(peruvians$V1))[peruvians$V1]
-age=age[2:end(age)]
-migration=as.numeric(levels(peruvians$V2))[peruvians$V2]
-migration=migration[2:end(migration)]
-weight=as.numeric(levels(peruvians$V3))[peruvians$V3]
-weight=weight[2:end(weight)]
-length=as.numeric(levels(peruvians$V4))[peruvians$V4]
-length=length[2:end(length)]
-wrist=as.numeric(levels(peruvians$V8))[peruvians$V8]
-wrist=wrist[2:end(wrist)]
-systolic=as.numeric(levels(peruvians$V9))[peruvians$V9]
-systolic=systolic[2:end(systolic)]
-diastolic=as.numeric(levels(peruvians$V10))[peruvians$V10]
-diastolic=diastolic[2:end(diastolic)]
-```
-```{r}
-cor(age,migration)
-cor(weight,migration)
-cor(length,migration)
-cor(wrist,migration)
-cor(systolic,migration)
-cor(diastolic,migration)
-```
-
-By the numbers here above, we can confirm what was before stated that the variable which is most likely to be correlated to migration is age. The other variables had a very low or even negative values. The variable "weight" had correlation of 0.4811, which is not as low as the others, however we can't consider here it being correlated to "migration" as this value is still low.
-
