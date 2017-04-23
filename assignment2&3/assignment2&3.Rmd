@@ -92,7 +92,7 @@ As it can be seen from the box plots, there is a significant difference between 
 Here, we will make use of both mean and median values of each data set. We have created a function to take into account this choice. The results are given right after.
 ```{r}
 # for means
-mean(light1879)
+
 B=1000
 T1 = mean(light1879)
 d = light1879
