@@ -228,6 +228,7 @@ wilcox.test(klm,mu=70)
 ```
 
 Wilcox test shows that the null hypothesis that the delivery period is maximum of 70 days is rejected. 
+***
 
 
 ##EXERCISE 4
@@ -242,9 +243,9 @@ To see if there was an improvement, deterioration, or if the means of times have
 
 clouds = read.table('clouds.txt',header = FALSE)
 a=as.numeric(levels(clouds$V1))[clouds$V1]
-a=a[2:end(a)]
+# a=a[2:end(a)]
 b=as.numeric(levels(clouds$V2))[clouds$V2]
-b=b[2:end(b)]
+# b=b[2:end(b)]
 
 ```
 
