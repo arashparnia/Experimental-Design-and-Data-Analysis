@@ -21,29 +21,32 @@ be performed using a level of 0.05, unless otherwise specified.
 telephone = read.table('telephone.txt')
 d <- as.numeric(levels(telephone$V1))[telephone$V1]
 d <- d[!is.na(d)] 
-# shapiro.test(d)
-# hist(d)
-# m = Filter(is.numeric, mydata)
-# length(d) # number of elements or components
-# str(d)    # structure of an object
-# class(d)  # class or type of an object
-# names(d)  # names
 
 B=1000
 Tstar=numeric(B)
+tall = numeric(B)
 for(i in 1:B){
   Xstar=sample(d,replace=TRUE)
   Tstar[i]=median(Xstar)
+  tall[i] = median(rexp(n = B, rate = 0.035))
 }
 
-Tstar25=quantile(Tstar,0.025)
-Tstar975=quantile(Tstar,0.975)
+# Tstar25=quantile(Tstar,0.025)
+# Tstar975=quantile(Tstar,0.975)
 # sum(Tstar<Tstar25)
-T1 = mean(d)
-c(2*T1-Tstar975,2*T1-Tstar25)
+# T1 = mean(d)
+# c(2*T1-Tstar975,2*T1-Tstar25)
 
+
+t = median(tall)
+
+pl=sum(Tstar<t)/B
+pr=sum(Tstar>t)/B
+p=2*min(pl,pr)
+p
 
 ```
+for P value at 0.022 We reject H0 and  we conclude that it is not likley that the sample is from the standard exponential distribution with λ = 0.035.
 
 #### 2. Make an appropriate plot of this data set. What information can be extracted from these data? What marketing advice would you give to the marketing manager?
 
@@ -99,7 +102,7 @@ d = light1879
 Tstar=numeric(B)
 for(i in 1:B){
   Xstar=sample(d,replace=TRUE)
-  Tstar[i]=median(Xstar)
+  Tstar[i]=mean(Xstar)
 }
 
 Tstar25=quantile(Tstar,0.025)
@@ -115,7 +118,7 @@ d = light1882
 Tstar=numeric(B)
 for(i in 1:B){
   Xstar=sample(d,replace=TRUE)
-  Tstar[i]=median(Xstar)
+  Tstar[i]=mean(Xstar)
 }
 
 Tstar25=quantile(Tstar,0.025)
@@ -131,7 +134,7 @@ d = light
 Tstar=numeric(B)
 for(i in 1:B){
   Xstar=sample(d,replace=TRUE)
-  Tstar[i]=median(Xstar)
+  Tstar[i]=mean(Xstar)
 }
 
 Tstar25=quantile(Tstar,0.025)
@@ -157,7 +160,7 @@ for(i in 1:B){
 Tstar25=quantile(Tstar,0.025)
 Tstar975=quantile(Tstar,0.975)
 # sum(Tstar<Tstar25)
-T1 = mean(d)
+T1 = median(d)
 c(2*T1-Tstar975,2*T1-Tstar25)
 
 median(light1882)
@@ -173,7 +176,7 @@ for(i in 1:B){
 Tstar25=quantile(Tstar,0.025)
 Tstar975=quantile(Tstar,0.975)
 # sum(Tstar<Tstar25)
-T1 = mean(d)
+T1 = median(d)
 c(2*T1-Tstar975,2*T1-Tstar25)
 
 median(light)
@@ -189,7 +192,7 @@ for(i in 1:B){
 Tstar25=quantile(Tstar,0.025)
 Tstar975=quantile(Tstar,0.975)
 # sum(Tstar<Tstar25)
-T1 = mean(d)
+T1 = median(d)
 c(2*T1-Tstar975,2*T1-Tstar25)
 
 ```
@@ -216,18 +219,26 @@ hist(klm)
 boxplot(klm)
 summary(klm)
 library(BSDA)
-p <- SIGN.test(klm , md = 32)
-p
+SIGN.test(klm , md = 32,alternative = "greater")
+
+
 
 ```
 The sign test concludes that the true median is not equal to 32, therefore rejecting the null hypothesis that the median is smaller or equal to 32 days. 
 
 ####2. KLM is willing to accept that (on average over a long period) at most 10% of the parts arrives after the maximum delivery period of 70 days. Design a test analogously to the sign test to check whether this criterium is met. Perform this test on the KLM data.
+# have to filter stuff here first 
+
 ```{r}
-wilcox.test(klm,mu=70)
+klm-70
+rank(abs(klm-70))
+rank(abs(klm-70))[klm-70>0]
+sum(rank(abs(klm-70))[klm-70>0])
+
+wilcox.test(klm,mu=70,alternative = "less")
 ```
 
-Wilcox test shows that the null hypothesis that the delivery period is maximum of 70 days is rejected. 
+Wilcox test shows that the null hypothesis that the delivery period is maximum of 70 days can not be rejected. Therefore it is plasuble to think that parts arrive after the maximum
 ***
 
 
@@ -409,7 +420,6 @@ qqnorm(difference_energy)
 ```
 
 ***
-#todo check every part 
 ##EXERCISE 3
 
 ####1. Make boxplots of the 3 samples. Make QQ-plots of the 3 samples against the normal distribution (a separate plot for each of the drugs). Is it reasonable to assume that these samples were taken from normal populations?
@@ -437,28 +447,37 @@ qqnorm(rnorm(length(dogs$cyclopropane)), xlab="random", main="Cyclopropane rando
 ```
 ####2. Test the null hypothesis that the concentration is the same under the different drugs using normal theory. Give the estimated concentration of plasma epinephrine for each of the three anesthesia drugs.
 
+```{r}
+
+
+```
+
+
+
 
 ####3. Perform the Kruskal-Wallis test for the same null hypothesis. What is the conclusion here? Explain possible differences between this conclusion and the conclusion under part 2.
 First we create data frames as numeric and factor.
 ```{r}
-dogsframeiso = dogs[,-c(2,3)]
+dogsframeiso = dogs[,-c(2,3)] # subsetting only iso
 isofluorane=as.vector(as.matrix(dogs))
-group1=as.factor(as.numeric(rep(1:1,each=10)))
+group1=as.factor(as.numeric(rep(1:3,each=10)))
 dogsframeiso = data.frame(isofluorane, group1)
-dogsframeiso[1:10,]
+# dogsframeiso = dogsframeiso[1:10,]
 
-dogsframehalo = dogs[,-c(1,3)]
+dogsframehalo = dogs[,-c(1,3)] # subsetting only halo 
 halothane=as.vector(as.matrix(dogs))
 group2=as.factor(as.numeric(rep(1:3,each=10)))
 dogsframehalo = data.frame(halothane,group2)
-dogsframehalo[12:21,]
+# dogsframehalo = dogsframehalo[12:21,]
 
 
-dogsframecyclo = dogs[,-c(1,2)]
+dogsframecyclo = dogs[,-c(1,2)] # subsetting only cyclo
 cyclopropane=as.vector(as.matrix(dogs))
 group3=as.factor(as.numeric(rep(1:3,each=10)))
 dogsframecyclo = data.frame(cyclopropane,group3)
-dogsframecyclo[22:30,]
+# dogsframecyclo = dogsframecyclo[22:30,]
+
+
 ```
 then we perform Kruskal Wallis test on isofluorane,halothane and cyclopropane
 ```{r}
@@ -470,3 +489,5 @@ kruskal.test(halothane,group2)
 kruskal.test(cyclopropane,group3)
 
 ```
+we conclude that all Kruskal-Wallis tests reject their null hypothesis that the concentration is the same under the different drugs.
+this is different from the previous conlusion because the previous test assumed normality while this test did not assume normality.
