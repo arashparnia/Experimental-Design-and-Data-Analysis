@@ -2,21 +2,25 @@
 title: "Assignment 2, EDDA 2017"
 author: "Fabio Curi Paixao (2592802) Arash Parnia (2591051) - Group 22"
 date: "19 April 2017"
-output: html_notebook
+output:
+  pdf_document: default
+  html_notebook: default
 ---
 
 
-***
+
 ## Introduction
 
 In the present document, the results for the second and third assignment of the EDDA course are presented.
 
-##Assignment 2
-be performed using a level of 0.05, unless otherwise specified.
+## Assignment 2
 
-###EXERCISE 1
+### Exercise 1
 
-#### 1. Test whether the data in telephone.txt stems from the exponential distribution Exp(λ) with λ = 0.035, by performing a bootstrap test using the test statistic T(X1, . . . , XN ) = median(X1, . . . , XN ).
+#### 1
+
+The following R code will check whether the 'telephone.txt' dataset stems from the exponential distribution exp(0.035).
+
 ```{r}
 telephone = read.table('telephone.txt')
 d <- as.numeric(levels(telephone$V1))[telephone$V1]
@@ -46,21 +50,20 @@ p=2*min(pl,pr)
 p
 
 ```
-for P value at 0.022 We reject H0 and  we conclude that it is not likley that the sample is from the standard exponential distribution with λ = 0.035.
+Since the p-value in lower than 0.05, we reject H0 and we conclude that it is not likely that the sample comes from the standard exponential distribution exp(0.035).
 
-#### 2. Make an appropriate plot of this data set. What information can be extracted from these data? What marketing advice would you give to the marketing manager?
-
+#### 2 
 
 ```{r}
-hist(Tstar,prob=T1,main="Tstar")
+hist(d,prob=TRUE)
 ```
+An appropriate plot for this data is the histogram shown here above, as it indicates the amplitudes in which the clients lie with their first month bills. 
+As the histogram indicates, the highest portion of the sample lies in lower intervals. However, a considerable portion of the same sample lies in the end of the histogram, which indicates that their bills have been rather expensive. Thus, as consultant, we could advise this company to propose to their clients a new offer in which their bills would have a fixed price, however with limited amount of calls. Thus, we could expect the beginning of the histogram to remain the same, an averaging in the middle, and a shortening in the end. 
 
+### Exercise 2 
 
+First of all, we will make the adjusments necessary for the three databases to be able to be compared. These adjustments are needed since the measurement procedures between both scientists were different.
 
-##EXERCISE 2
-
-####1. Make histograms and box plots of the data sets. What do you observe?
-First of all, we will make the adjustments necessary for the three databases to be able to be compared. These adjustments are needed since the measurement procedures between both scientists were different.
 ```{r}
 light1879 = scan(file="light1879.txt");
 light1882 = scan(file="light1882.txt");
@@ -70,13 +73,19 @@ light = light/1000  + 24.8
 
 light = 7.442 * 1000 /light 
 light = light * 1000
- 
+
 
 light1879 = light1879 + 299000
 light1882 = light1882 + 299000
 
 light = light[light > 0]
+```
 
+#### 1
+
+Here below are the histograms and the boxplots for the three datasets.
+
+```{r}
 par(mfrow=c(1,3))
 hist(light1879,prob = T)
 hist(light1882,prob = T)
@@ -86,13 +95,13 @@ par(mfrow=c(1,3))
 boxplot(light1879)
 boxplot(light1882)
 boxplot(light)
-
 ```
+As it can be seen from the boxplots, there is a significant difference between the measurements made in 1879 by Michelson in 1879 and 1882 and from Newcomb's measurements from 1882. The median values of the boxplots are considerably different between the former and these two last. Furthermore, between the two measurements from 1882, Newcomb managed to obtain his results in a fairly narrower amplitude, which is maybe thanks to his methodology and/or equipments used.
 
-As it can be seen from the box plots, there is a significant difference between the measurements made in 1879 by Michelson in 1879 and 1882 and from Newcomb's measurements from 1882. The median values of the box plots are considerably different between the former and these two last. Furthermore, between the two measurements from 1882, Newcomb managed to obtain his results in a fairly narrower amplitude, which is maybe thanks to his methodology and/or equipment used.
+#### 2
 
-####2. Determine confidence intervals for the speed of light in km/sec for all three data sets (use population means and medians).
-Here, we will make use of both mean and median values of each data set. We have created a function to take into account this choice. The results are given right after.
+Here, we will make use of both mean and median values of each dataset. We have created a function to take into account this choice. The results are given right after.
+
 ```{r}
 # for means
 
@@ -101,8 +110,8 @@ T1 = mean(light1879)
 d = light1879
 Tstar=numeric(B)
 for(i in 1:B){
-  Xstar=sample(d,replace=TRUE)
-  Tstar[i]=mean(Xstar)
+Xstar=sample(d,replace=TRUE)
+Tstar[i]=mean(Xstar)
 }
 
 Tstar25=quantile(Tstar,0.025)
@@ -117,8 +126,8 @@ T1 = mean(light1882)
 d = light1882
 Tstar=numeric(B)
 for(i in 1:B){
-  Xstar=sample(d,replace=TRUE)
-  Tstar[i]=mean(Xstar)
+Xstar=sample(d,replace=TRUE)
+Tstar[i]=mean(Xstar)
 }
 
 Tstar25=quantile(Tstar,0.025)
@@ -133,8 +142,8 @@ T1 = mean(light)
 d = light
 Tstar=numeric(B)
 for(i in 1:B){
-  Xstar=sample(d,replace=TRUE)
-  Tstar[i]=mean(Xstar)
+Xstar=sample(d,replace=TRUE)
+Tstar[i]=mean(Xstar)
 }
 
 Tstar25=quantile(Tstar,0.025)
@@ -142,8 +151,6 @@ Tstar975=quantile(Tstar,0.975)
 # sum(Tstar<Tstar25)
 T1 = mean(d)
 c(2*T1-Tstar975,2*T1-Tstar25)
-
-
 
 # for median 
 
@@ -153,8 +160,8 @@ T1 = median(light1879)
 d = light1879
 Tstar=numeric(B)
 for(i in 1:B){
-  Xstar=sample(d,replace=TRUE)
-  Tstar[i]=median(Xstar)
+Xstar=sample(d,replace=TRUE)
+Tstar[i]=median(Xstar)
 }
 
 Tstar25=quantile(Tstar,0.025)
@@ -169,8 +176,8 @@ T1 = median(light1882)
 d = light1882
 Tstar=numeric(B)
 for(i in 1:B){
-  Xstar=sample(d,replace=TRUE)
-  Tstar[i]=median(Xstar)
+Xstar=sample(d,replace=TRUE)
+Tstar[i]=median(Xstar)
 }
 
 Tstar25=quantile(Tstar,0.025)
@@ -185,8 +192,8 @@ T1 = median(light)
 d = light
 Tstar=numeric(B)
 for(i in 1:B){
-  Xstar=sample(d,replace=TRUE)
-  Tstar[i]=median(Xstar)
+Xstar=sample(d,replace=TRUE)
+Tstar[i]=median(Xstar)
 }
 
 Tstar25=quantile(Tstar,0.025)
@@ -194,23 +201,23 @@ Tstar975=quantile(Tstar,0.975)
 # sum(Tstar<Tstar25)
 T1 = median(d)
 c(2*T1-Tstar975,2*T1-Tstar25)
-
 ```
 
-####3. Comment on the intervals found.
+#### 3
 
-Intervals show that  all measurements are closely range within 299000 interval.
+Intervals show that all measurements are closely ranged around 299000.
 
-####4. Find on the internet the currently most accurate value for the speed of light. Is it consistent with the measurements of Michelson and Newcomb?
-Speed of light is  299792458 m / s and  299792.458 kps
-The speed of light closely resembles the measurements of the French physicists Fizeau and Foucault.
+#### 4 
+
+Speed of light is 299792458 m / s and 299792.458 kps, and it closely ressembles the measurements of the French physicists Fizeau and Foucault.
 
 
-##EXERCISE 3
+### Exercise 3
 
-####1. Test (using an appropriate test) the null hypothesis that the median duration µ is smaller or equal to 32 days against the alternative hypothesis that this median is greater than 32 days. Motivate your choice of test.
+#### 1
 
-We will now test the null hypothesis that the median duration is smaller or equal to 32 days against the alternative hypothesis that this median is greater than 32 days.
+Now, we will explore the file "klm.txt". We will now test the null hypothesis that the median duration is smaller or equal to 32 days against the alternative hypothesis that this median is greater than 32 days.
+
 ```{r}
 klm = read.table('klm.txt')
 klm = c(klm$V1,klm$V2,klm$V3,klm$V4,klm$V5)
@@ -220,14 +227,11 @@ boxplot(klm)
 summary(klm)
 library(BSDA)
 SIGN.test(klm , md = 32,alternative = "greater")
-
-
-
 ```
-The sign test concludes that the true median is not equal to 32, therefore rejecting the null hypothesis that the median is smaller or equal to 32 days. 
 
-####2. KLM is willing to accept that (on average over a long period) at most 10% of the parts arrives after the maximum delivery period of 70 days. Design a test analogously to the sign test to check whether this criterium is met. Perform this test on the KLM data.
-# have to filter stuff here first 
+The sign test concludes that the true median is not equal to 32, therefore inducing to reject the null hypothesis that the median is smaller or equal to 32 days.
+
+#### 2
 
 ```{r}
 klm-70
@@ -237,52 +241,44 @@ sum(rank(abs(klm-70))[klm-70>0])
 
 wilcox.test(klm,mu=70,alternative = "less")
 ```
-
-Wilcox test shows that the null hypothesis that the delivery period is maximum of 70 days can not be rejected. Therefore it is plasuble to think that parts arrive after the maximum
-***
+The Wilcox test shows that the null hypothesis indicating that the delivery period is maximum of 70 days can not be rejected. Therefore it is plausible to think that parts arrive after the maximum.
 
 
-##EXERCISE 4
-####1. Test whether silver nitrate has an effect by performing three tests: the two samples t-test (argue whether the data are paired or not), the MannWhitney test and the Kolmogorov-Smirnov test. Indicate whether these tests are applicable for our research question. Comment on your findings.
-To see if there was an improvement, deterioration, or if the means of times have remained substantially the same (hypothesis H0), we need to make a Student’s t-test for paired samples:
+### Exercise 4
+
+In this subsection, we will explore the file "clouds.txt".
+
 ```{r}
-# clouds = read.table('clouds.txt',header = FALSE)
-# par(mfrow=c(1,3))
-# plot(V1~V2,data=clouds); abline(0,1)
-# boxplot(clouds$V1)
-# boxplot(clouds[,1]-clouds[,2])
-
 clouds = read.table('clouds.txt',header = FALSE)
 a=as.numeric(levels(clouds$V1))[clouds$V1]
-# a=a[2:end(a)]
+a=a[2:end(a)]
 b=as.numeric(levels(clouds$V2))[clouds$V2]
-# b=b[2:end(b)]
-
+b=b[2:end(b)]
 ```
 
-To see if there was an improvement, deterioration, or if the means of times have remained substantially the same (hypothesis H0), we need to make a Student’s t-test for paired samples:
+#### 1 
+
+To see if there was an improvement, deterioration, or if the means of times have remained substantially the same (hypothesis H0), we need to make a Student's t-test for paired samples:
 ```{r}
 t.test(a,b, paired=TRUE)
 ```
 Here, we asked R to check whether the mean of the values contained in the vector a is equal to the mean of the values contained in the vector b, thus checking whether there has not been any improvement/nor worsening in the amount of rainfall after seeding (H0).
-The p-value is just above 0.05, we do not reject the null hypothesis.
+The p-value is right below 0.05, so we reject the null hypothesis.
 
 Then, we perform Mann-Whitney test and the Kolmogorov-Smirnov test.
 
 ```{r}
-print(wilcox.test(a,b,paired=TRUE) )
+wilcox.test(a,b,paired=TRUE) 
 ```
-The null hypothesis is that the rainfall of the two sample unseeded and seeded clouds are identical populations. As the p-value turns out to be 0.006131, and is less than the .05 significance level, we reject the null hypothesis.
+The null hypothesis is that the rainfall of the two sample unseeded and seeded clouds are identical populations. As the p-value turns out to be 0.006131, and is less than the .05 significance level, we again reject the null hypothesis.
 
 ```{r}
-print(ks.test(a,b,paired=TRUE))
+ks.test(a,b,paired=TRUE)
 ```
-
 
 Here, the same conclusion can be made, as the p-value for is below 0.05. In the present case, applying these three tests might not be applicable, as it could be proved in practice that seeding clouds would be an improvement for the amount of rainfall. What is lacking here is maybe the inclusion of other variables important for such rise of rainfall, such as local temperature, wind, among others. Or simply, make use of other procedures to calculate an eventual evidence.
 
-####2. Repeat the same procedure on the square root of the values in clouds.txt. Comment on your findings.
-
+#### 2
 
 Now, we will take the squared root of the values in the file.
 
@@ -297,9 +293,9 @@ wilcox.test(a_2,b_2,paired=TRUE)
 ks.test(a_2,b_2,paired=TRUE)
 ```
 
-The values for the t.test dropped from 0.05375 to 0.01278; for the Wilcox on, it increased from 0.006131 to 0.01278, and for the Kolmogorov-Smirnov, it remained the same.
+The values for the t.test dropped from 0.04407 to 0.01278; for the Wilcoxon, it increased from 0.006131 to 0.009383, and for the Kolmogorov-Smirnov, it remained the same.
 
-####3. Repeat the same procedure on the square root of the square root of the values in clouds. Comment on your findings.
+#### 3
 
 Finally, the squared root of the squared root of the values in the file are considered.
 
@@ -314,34 +310,27 @@ wilcox.test(a_3,b_3,paired=TRUE)
 ks.test(a_3,b_3,paired=TRUE)
 ```
 
-Now, the values for the t.test dropped from 0.01278 to 0.008811; for the Wilcox on, it decreased from 0.01278 to 0.007291 (close to the first simulation - 0.006131), and for the Kolmogorov-Smirnov, it still remained the same.
-***
-***
+Now, the values for the t.test dropped from 0.01278 to 0.008811; for the Wilcoxon, it decreased from 0.009383 to 0.007291, and for the Kolmogorov-Smirnov, it still remained the same.
 
-#Assignment 3
-be performed using a level of 0.05, unless otherwise specified.
+## Assignment 3
 
-##EXERCISE 1
+### Exercise 1
 
-####1. Use pairs to make plots of each pair of two variables. Based on this picture, which variables do you expect to correlate (in rank) with migration?
-We obtain the pairs plot for the correlation between variables age (V1), weight (V3), length (V4), wrist (V8), systolic (V9) and diastolic (V10) with migration (V2). The area of interest is concentrated on the second row, and also second column. From this plot, we decided that only the variable "age" would be correlated to "migration", as it is the only which seemly respects an uprising behavior, as in the oldest the person is, the longest he/she would be expected to having been under the status of migrant. 
+#### 1
+
+In this subsection, we will explore the file "peruvians.txt" with the data of Peruvian men after migrating to a modern society.
 
 ```{r}
-# peruvians = read.table('peruvians.txt',header = FALSE)
-# <!-- par(mfrow=c(1,3)) -->
-# plot(V2~V6,data=peruvians); abline(0,1)
-# names(peruvians);
-# plot(peruvians$V2,peruvians$V6);
-# boxplot(clouds$V1)
-# boxplot(clouds[,1]-clouds[,2])
 peruvians = read.table('peruvians.txt')
 peruvians = peruvians[,-c(5,6,7)]
 pairs(peruvians)
-
 ```
 
+We obtain the pairs plot for the correlation between variables age (V1), weight (V3), length (V4), wrist (V8), systolic (V9) and diastolic (V10) with migration (V2). The area of interest is concentrated on the second row, and also second column. From this plot, we decided that only the variable "age" would be correlated to "migration", as it is the only which seemly respects an uprising behaviour, as in the oldest the person is, the longest he/she would be expected to having been under the status of migrant. 
 
-####2. Perform a test for each of the variables to test the rank correlation between that variable and migration. Give your conclusions of each test separately.
+#### 2
+
+Now, we will study the correlation of these variables with "migration".
 
 ```{r}
 age=as.numeric(levels(peruvians$V1))[peruvians$V1]
@@ -367,25 +356,35 @@ cor(wrist,migration)
 cor(systolic,migration)
 cor(diastolic,migration)
 ```
+
 By the numbers here above, we can confirm what was before stated that the variable which is most likely to be correlated to migration is age. The other variables had a very low or even negative values. The variable "weight" had correlation of 0.4811, which is not as low as the others, however we can't consider here it being correlated to "migration" as this value is still low.
 
-***
-##EXERCISE 2
+### Exercise 2
 
-####1. Study the data and make a few graphical representations.
-The best way to represent this data is through separating it into two different data sets: one for "lemo" and another for "energy".
+The best way to represent this data is through separating it into two different datasets: one for "lemo" and another for "energy".
+
 ```{r}
 run = read.table('run.txt')
 lemo = subset(run,drink=="lemo")[,-c(3)]
 energy = subset(run,drink=="energy")[,-c(3)]
+```
 
+#### 1
+
+A graphical representation of the data is here shown:
+
+```{r}
 boxplot(run[,-c(3)])
 
 par(mfrow=c(1,1))
 boxplot(lemo)
 boxplot(energy)
 ```
-####2. Test separately, for both the softdrink and the energy drink conditions, whether there is a difference in speed in the two running tasks.
+
+In general, the median of the boxplot after having drunk the lemon soda was higher, while for the energy drink it was lower. However, the upper and lower limits are limited in a wider range for both cases after having drunk the beverages.
+
+#### 2
+
 ```{r}
 t.test(lemo$before, lemo$after);
 
@@ -394,7 +393,7 @@ t.test(energy$before, energy$after);
 The results of the t.test show that, for those having drunk "lemo", the hypothesis H0 which states that the mean values before and after drinking the beverage are equal, is maintained as the p-value of 0.6203 is clearly higher than 0.05.
 For the beverage "energy", the p-value of 0.3407 maintains the hypothesis H0, however with lower value, which could suggest that, for instance, the energy could have made a difference in the overall performance.
 
-####3. For each pupil compute the time difference between the two running tasks. Test whether these time differences are effected by the type of drink.
+#### 3
 
 ```{r}
 run$difference = run$after - run$before
@@ -405,58 +404,82 @@ t.test(difference_lemo, difference_energy)
 ```
 Effectively, even though the hypothesis H0 is not rejected here, the p-value is still low and the means of the differences for lemo and energy shown in the report state that there is a significant difference, specially for the latter one being negative. Thus, the time differences can be considered to be affected by the beverages.
 
-####4. Can you think of a plausible objection to the design of the experiment if the main aim was to test whether drinking the energy drink speeds up the running?
-One objection would be, since it is expected that the energy drink takes some time to take effect in the pupils' metabolism, the data collected could have also considered that the same amount of beverage can be obsorbed differently by the pupils and thus, the results might end misleading or even not leading to any conclusion whatsoever.
+#### 4
+
+One objection would be, since it is expected that the energy drink takes some time to take effect in the pupils' metabolism, the data collected could have also considered that the same amount of beverage can be absorved differently by the pupils and thus, the results might end misleading or even not leading to any conclusion whatsoever.
 
 
-####5. Is there a similar objection to the design relative to the analysis under 3)?
+#### 5
+
 For the same reasons, the metabolism of the pupils react differently. For instance, regardless of what beverage was consumed, a very slim and short person would not present a difference proportional to a chubbier person with more height, under normal circumstances. Thus, the height and the weight of the pupils could have been taken into account.
 
-####6. The vector of differences in 3) has 24 elements. Which distributional assumption on these differences is needed for the analysis in 3)? How would you transform this vector into 24 residuals to investigate this assumption in QQ-plots? Make this QQ-plot(s).
+#### 6
+
+The QQ-plots for the differences are given here after.
+
 ```{r}
 par(mfrow=c(1,2))
 qqnorm(difference_lemo)
 qqnorm(difference_energy)
 ```
 
-***
-##EXERCISE 3
+### Exercise 3
 
-####1. Make boxplots of the 3 samples. Make QQ-plots of the 3 samples against the normal distribution (a separate plot for each of the drugs). Is it reasonable to assume that these samples were taken from normal populations?
 ```{r}
-dogs <- read.table("dogs(2).txt", header=TRUE)
+dogs <- read.table("dogs(2).txt", header=TRUE, quote="\"")
+```
 
+#### 1 
 
+Please find here after the boxplots and the QQ-plots of the samples, as well as the QQ-plots of the normal distributions with the same sizes of the respective samples.
+
+```{r}
 par(mfrow=c(1,3))
-boxplot(dogs$isofluorane,xlab="isofluorane")
-boxplot(dogs$halothane,xlab="halothane")
-boxplot(dogs$cyclopropane,xlab="cyclopropane")
+
+boxplot(dogs$isofluorane, xlab="isofluorane")
+boxplot(dogs$halothane, xlab="halothane")
+boxplot(dogs$cyclopropane, xlab="cyclopropane")
 
 par(mfrow=c(1,2))
 
-qqnorm(dogs$isofluorane, xlab="sample", main="Isofluorane")
-qqnorm(rnorm(length(dogs$isofluorane)), xlab="random", main="Isofluorane random")
+# Create QQ-plots of Isofluorane and normal distribution
+qqnorm(dogs$isofluorane, xlab="sample", main="QQ-plot Isofluorane")
+qqnorm(rnorm(length(dogs$isofluorane)), xlab="random", main="QQ-plot Isofluorane")
 
-qqnorm(dogs$halothane, xlab="sample", main="Halothane")
-qqnorm(rnorm(length(dogs$halothane)), xlab="random", main="Halothane random")
+# Create QQ-plots of Halothane and normal distribution
+qqnorm(dogs$halothane, xlab="sample", main="QQ-plot Halothane")
+qqnorm(rnorm(length(dogs$halothane)), xlab="random", main="QQ-plot Halothane")
 
-qqnorm(dogs$cyclopropane, xlab="sample", main="Cyclopropane")
-qqnorm(rnorm(length(dogs$cyclopropane)), xlab="random", main="Cyclopropane random")
-
-
+# Create QQ-plots of Cycloprane and normal distribution
+qqnorm(dogs$cyclopropane, xlab="sample", main="QQ-plot Cyclopropane")
+qqnorm(rnorm(length(dogs$cyclopropane)), xlab="random", main="QQ-plot Cyclopropane")
 ```
-####2. Test the null hypothesis that the concentration is the same under the different drugs using normal theory. Give the estimated concentration of plasma epinephrine for each of the three anesthesia drugs.
+After analysing the three comparisons between QQ-plots of the drugs and the normal distributions, it is reasonable to state that isufluorane values do not follow a normal distribution, while the other two do. This is explained by the fact that the former one does not really respect a behavior of an uprising line in the QQ-plot graph.
+
+#### 2
+
+Now, we will try to check the hypothesis that is the same under the different drugs.
 
 ```{r}
+t.test(dogs$isofluorane,dogs$halothane)
+t.test(dogs$isofluorane,dogs$cyclopropane)
+t.test(dogs$cyclopropane,dogs$halothane)
+```
+Thus, the results show that the p-value for assuming that the means of concentrations of plasma epinephrine under isofluorane and halothane is 0.7328, which is proof that this hypothesis can not be rejected. For the other two t.tests, the p-values are lower than 0.05, which unables us to accept the hypothesis that the respective pairwise instances in the t.tests have the same mean. So as to better picture this fact, find here after the estimated concentrations of plasma epinephrine for each scenario, which confirms the results so-far obtained:
 
-
+```{r}
+mean_iso=mean(dogs$isofluorane)
+mean_halo=mean(dogs$halothane)
+mean_cyclo=mean(dogs$cyclopropane)
+mean_iso
+mean_halo
+mean_cyclo
 ```
 
+#### 3
 
+First, we create data frames as numeric and factor.
 
-
-####3. Perform the Kruskal-Wallis test for the same null hypothesis. What is the conclusion here? Explain possible differences between this conclusion and the conclusion under part 2.
-First we create data frames as numeric and factor.
 ```{r}
 dogsframeiso = dogs[,-c(2,3)] # subsetting only iso
 isofluorane=as.vector(as.matrix(dogs))
@@ -477,11 +500,6 @@ group3=as.factor(as.numeric(rep(1:3,each=10)))
 dogsframecyclo = data.frame(cyclopropane,group3)
 # dogsframecyclo = dogsframecyclo[22:30,]
 
-
-```
-then we perform Kruskal Wallis test on isofluorane,halothane and cyclopropane
-```{r}
-
 kruskal.test(dogsframeiso,group1)
 
 kruskal.test(halothane,group2)
@@ -489,5 +507,4 @@ kruskal.test(halothane,group2)
 kruskal.test(cyclopropane,group3)
 
 ```
-we conclude that all Kruskal-Wallis tests reject their null hypothesis that the concentration is the same under the different drugs.
-this is different from the previous conlusion because the previous test assumed normality while this test did not assume normality.
+We conclude that the first Kruskal-Wallis test rejects the null hypothesis that the concentration is the same under the different drugs. The two others do not reject this hypothesis. This is different from the previous conclusion because the previous test assumed normality while this test did not.
