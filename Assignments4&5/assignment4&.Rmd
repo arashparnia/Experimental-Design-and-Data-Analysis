@@ -79,10 +79,9 @@ abline(h=0)
 
 
 
-***
 ##EXERCISE 2
 ```{r}
-search = read.table("input/search.txt", header=TRUE, quote="\"")
+search = read.table("search.txt", header=TRUE, quote="\"")
 ```
 
 A researcher is interested in the time it takes a student to find a certain product
@@ -146,7 +145,7 @@ anova(aovsearch_noskill)
 
 ##EXERCISE 3
 ```{r}
-cream = read.table("input/cream.txt", header=TRUE, quote="\"")
+cream = read.table("cream.txt", header=TRUE, quote="\"")
 ```
 
 The file cream.txt contains data on an experiment to produce sour cream.
@@ -179,7 +178,7 @@ summary(aovcream)
 
 ###3. A p-value for the test H0 : α2 = α1 is also in the output of summary in 2). What is it? Is it coincidence that it is smaller than the simultaneous p-value?
 ```{r}
-
+# install.packages(multcomp)
 library(multcomp)
 multcream=glht(aovcream,linfct=mcp(starter="Tukey"))
 summary(multcream)
@@ -198,7 +197,7 @@ confint(multcream)
 
 ##EXERCISE 4
 ```{r}
-
+cow = read.table("cow.txt", header=TRUE, quote="\"")
 ```
 
 In a study on the effect of feedingstuffs on lactation a sample of nine cows
@@ -210,64 +209,110 @@ The observed data can be found in the file cow.txt, where A and B refer to
 the types of feedingstuffs.
 
 ###1. Test whether the type of feedingstuffs influences milk production using an ordinary “fixed effects” model, fitted with lm.
+```{r}
+
+```
+
 ###2. Estimate the difference in milk production.
+```{r}
+
+```
+
 ###3. Repeat 1. and 2. by performing a mixed effects analysis, modelling the cow effect as a random effect (use the function lmer). Compare your results to the results found by using a fixed effects model.
-###4. Study the commands:
+```{r}
+
+```
+
+###4. Study the commands: attach(cow)
+###t.test(milk[treatment=="A"],milk[treatment=="B"],paired=TRUE)
+###Does this produce a valid test for a difference in milk production? Is its
+###conclusion compatible with the one obtained in 1.? Why?
+```{r}
 attach(cow)
 t.test(milk[treatment=="A"],milk[treatment=="B"],paired=TRUE)
-Does this produce a valid test for a difference in milk production? Is its
-conclusion compatible with the one obtained in 1.? Why?
-
+```
 
 
 
 
 ***
-Experimental Design and Data Analysis: Assignment 5
+***
+***
+#Experimental Design and Data Analysis: Assignment 5
 This assignment consists of 3 exercises. Throughout this assignment tests should
 be performed using a level of 0.05.
-EXERCISE 1
+
+##EXERCISE 1
+```{r}
+nauseatable = read.table("nauseatable.txt", header=TRUE, quote="\"")
+```
+
 The file nauseatable contains data about post-operative nausea after medication
 against nausea. Two different medicines were administered to patients that
 complained about post-operative nausea. One of the medicines, Pentobarbital,
 was administered in two different doses.
-1. Set up a data.frame in R existing of two columns and 304 rows. One
-column should contain an indicator whether or not the patient in that
-row suffered from nausea, and the other column should indicate the medicin.
-(Use nausea.frame=data.frame(nausea,medicin) where nausea
-is a vector 0’s and 1’s and medicin is the vector containing the medicin
-labels for each patient. Make sure these columns match correctly.)
-2. Study the outcome of xtabs(∼medicin+naus).
-3. Perform a permutation test in order to test whether the different medicins
-work equally well against nausea. Permute the medicin labels for
-this purpose. Use as test statistic the chisquare test statistic for contingency
-tables, which can be extracted from the output of chisq.test:
-chisq.test(xtabs(∼medicin+nausea))[[1]].
-4. Compare the p-value found by the permutation test with the p-value
-found from the chisquare test for contingency tables. Explain the difference/equality
-of the two p-values.
-EXERCISE 2
+###1. Set up a data.frame in R existing of two columns and 304 rows. One column should contain an indicator whether or not the patient in that row suffered from nausea, and the other column should indicate the medicin. (Use nausea.frame=data.frame(nausea,medicin) where nausea is a vector 0’s and 1’s and medicin is the vector containing the medicin labels for each patient. Make sure these columns match correctly.)
+```{r}
+
+```
+
+###2. Study the outcome of xtabs(∼medicin+naus).
+```{r}
+
+```
+
+###3. Perform a permutation test in order to test whether the different medicins work equally well against nausea. Permute the medicin labels for this purpose. Use as test statistic the chisquare test statistic for contingency tables, which can be extracted from the output of chisq.test: chisq.test(xtabs(∼medicin+nausea))[[1]].
+```{r}
+
+```
+
+###4. Compare the p-value found by the permutation test with the p-value found from the chisquare test for contingency tables. Explain the difference/equality of the two p-values.
+```{r}
+
+```
+
+
+#EXERCISE 2
+```{r}
+airpollution = read.table("airpollution.txt", header=TRUE, quote="\"")
+```
+
 This exercise concerns the data in the file airpollution. Investigate which
 explanatory variables need to be included into a linear regression model with
 oxidant as the response variable. Do this as follows.
-1. Make scatter plots of the candidate explanatory variables against each
-other and against the response variable (see the R-function pairs()).
-Interpret the plots. Do you judge a linear model to be useful here?
-2. Determine for each of the explanatory variables the simple linear regression
-model. Choose the best among these models, and stepwise extend this
-model by adding one explanatory variable per step on the basis of the
-determination coefficient. Use a test to investigate whether the extensions
-are useful. Determine in this way an appropriate linear regression model
-for these data.
-3. Estimate the parameters in the full linear regression model with all explanatory
-variables in it. Now stepwise decrease this full model with the
-4
-aid of tests of the form H0 : βi = 0. Determine in this way an appropriate
-linear regression model for the data.
-4. Present the estimates of the parameters of the final model of your choice.
-5. Investigate the normality of the residuals of the chosen model. Do you
-think, in view of all results, that the chosen linear model is appropriate?
-EXERCISE 3
+
+
+###1. Make scatter plots of the candidate explanatory variables against each other and against the response variable (see the R-function pairs()). Interpret the plots. Do you judge a linear model to be useful here?
+```{r}
+
+```
+
+###2. Determine for each of the explanatory variables the simple linear regression model. Choose the best among these models, and stepwise extend this model by adding one explanatory variable per step on the basis of the determination coefficient. Use a test to investigate whether the extensions are useful. Determine in this way an appropriate linear regression model for these data.
+```{r}
+
+```
+
+###3. Estimate the parameters in the full linear regression model with all explanatory variables in it. Now stepwise decrease this full model with the aid of tests of the form H0 : βi = 0. Determine in this way an appropriate linear regression model for the data.
+```{r}
+
+```
+
+###4. Present the estimates of the parameters of the final model of your choice.
+```{r}
+
+```
+
+###5. Investigate the normality of the residuals of the chosen model. Do you think, in view of all results, that the chosen linear model is appropriate?
+```{r}
+
+```
+
+
+##EXERCISE 3
+```{r}
+expensescrime = read.table("expensescrime.txt", header=TRUE, quote="\"")
+```
+
 The data in expensescrime were obtained to determine factors related to state
 expenditures on criminal activities (courts, police, etc.) The variables are:
 state (indicating the state in the USA), expend (state expenditures on criminal
@@ -277,9 +322,21 @@ crime (crime rate per 100000), lawyers (number of lawyers in the state), employ
 1000). Perform a regression analysis using expend as response variable and bad,
 crime, lawyers, employ and pop as independent variables. Present your final
 model. Your analysis should at least include:
-a. investigation of potential or influence points
-b. investigation of problems due to collinearity
-c. investigation of residuals.
+###a. investigation of potential or influence points
+```{r}
+
+```
+
+###b. investigation of problems due to collinearity
+```{r}
+
+```
+
+###c. investigation of residuals.
+```{r}
+
+```
+
 You may use all techniques mentioned on the lecture slides. State clearly all
 the choices you make during the regression analysis, including arguments for all
 your choices. (Note that there are several strategies possible!)
