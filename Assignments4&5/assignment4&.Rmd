@@ -3,7 +3,7 @@ title: "R Notebook"
 output: html_notebook
 ---
 ***
-Experimental Design and Data Analysis: Assignment 4
+#Experimental Design and Data Analysis: Assignment 4
 This assignment consists of 4 exercises. Throughout this assignment tests should
 be performed using a level of 0.05. You will need to install the R-packages
 multcomp and lme4, which are not included in the standard distribution of R.
@@ -11,7 +11,12 @@ To use the package either choose multcomp and lme4 in menu Packages or type
 library(multcomp)
 library(lme4)
 Installing is a one-time task, loading the package is necessary at every R session.
-EXERCISE 1
+## EXERCISE 1
+```{r}
+bread = read.table("bread.txt", header=TRUE, quote="\"")
+names(bread)[2] = "temperature"
+```
+
 If left alone bread will become moldy, rot or decay otherwise. To investigate
 the influence of temperature and humidity on this process, the time to decay
 was measured for 18 slices of white bread, which were placed in 3 different
@@ -19,45 +24,41 @@ environments and humidified or not.
 The data are given in the file bread.txt, with the first column time to
 decay in hours, the second column the environment (cold, warm or intermediate
 temperature) and the third column the humidity.
-1. The 18 slices came from a single loaf, but were randomized to the 6 combinations
-of conditions. Present an R-code for this randomization process.
-2. Make two boxplots of hours versus the two factors and two interaction
-plots (keeping the two factors fixed in turn).
-3. Perform an analysis of variance to test for effect of the factors temperature,
-humidity, and their interaction. Describe the interaction effect in words.
-4. Which of the two factors has the greatest (numerical) influence on the
-decay? Is this a good question?
-5. Check the model assumptions by using relevant diagnostic tools. Are there
-any outliers?
+###1. The 18 slices came from a single loaf, but were randomized to the 6 combinations of conditions. Present an R-code for this randomization process.
 
 ```{r}
-#############################
-# Assignment 4 - Exercise 1 #
-#############################
-
-## Read file bread.txt
-bread = read.table("input/bread.txt", header=TRUE, quote="\"")
-names(bread)[2] = "temperature"
-
-## Exercise 1.1 ##
 # 18 slices, 6 combinations (3 env, 2 humid), 3 slices per combination
+#18 slices of white bread, which were placed in 3 different environments and humidified or not.
 I=3; J=2; N=3;
 rbind(rep(1:I,each=N*J), rep(1:J,N*I), sample(1:(N*I*J)))
 
-## Exercise 1.2 ##
+```
+
+###2. Make two boxplots of hours versus the two factors and two interaction plots (keeping the two factors fixed in turn).
+```{r}
 boxplot(hours~temperature,data=bread)
 boxplot(hours~humidity,data=bread)
 
-## Exercise 1.3 ##
+```
+
+###3. Perform an analysis of variance to test for effect of the factors temperature, humidity, and their interaction. Describe the interaction effect in words.
+```{r}
 attach(bread)
 interaction.plot(temperature,humidity,hours)
 interaction.plot(humidity,temperature,hours)
+```
 
-## Exercise 1.4 ##
+###4. Which of the two factors has the greatest (numerical) influence on the decay? Is this a good question?
+```{r}
 bread$temperature=as.factor(bread$temperature)
 bread$humidity=as.factor(bread$humidity)
 breadaov=lm(hours~temperature*humidity,data=bread)
 anova(breadaov)
+```
+
+###5. Check the model assumptions by using relevant diagnostic tools. Are there any outliers?
+
+```{r}
 
 
 ## Exercise 1.6 ##
@@ -79,7 +80,11 @@ abline(h=0)
 
 
 ***
-EXERCISE 2
+##EXERCISE 2
+```{r}
+search = read.table("input/search.txt", header=TRUE, quote="\"")
+```
+
 A researcher is interested in the time it takes a student to find a certain product
 on the internet using a search engine. There are three different types of interfaces
 with the search engine and especially the effect of these interfaces is of
@@ -87,38 +92,14 @@ importance. There are five different types of students, indicating their level o
 computer handling (the lower the value of this indicator, the better the computer
 handling of the corresponding student). Fifteen students are selected; three
 from each group with a certain level of computer handling.
-1. Number the selected students 1 to 15 and show how the students could be
-randomized to the interfaces in a randomized block design, by using R.
-1
-The experiment was run according to a randomized block design, as described.
-The data is given in the file search.txt.
-2. Make some graphical summaries of the data. Are any interactions between
-interface and skill apparent?
-3. Test the null hypothesis that the search time is the same for all interfaces.
-(Beware that the levels of the factors are coded by numbers!)
-4. Estimate the time it takes a typical user of skill level 4 to find the product
-on the website if the website uses interface 3.
-5. Make diagnostic plots to test the assumptions for the analysis. Comments?
-6. Perform the non-parametric Friedman test to test whether there is an
-effect of interface.
-7. Test the null hypothesis that the search time is the same for all interfaces
-by a one-way analysis of variance test, ignoring the variable skill. Is
-it right/wrong or useful/not useful to perform this test on this dataset?
-What assumption on the way the data were obtained is necessary for this
-test to be valid, and was this assumption met?
+###1. Number the selected students 1 to 15 and show how the students could be randomized to the interfaces in a randomized block design, by using R. 1 The experiment was run according to a randomized block design, as described. The data is given in the file search.txt.
 ```{r}
-#############################
-# Assignment 4 - Exercise 2 #
-#############################
-
-## Read file search.txt
-search = read.table("input/search.txt", header=TRUE, quote="\"")
-
-## Exercise 2.1 ##
 I=3;B=5;N=1
 for (i in 1:B) {print(sample(1:(N*I)))}
+```
 
-## Exercise 2.2 ##
+###2. Make some graphical summaries of the data. Are any interactions between interface and skill apparent?
+```{r}
 attach(search)
 par(mfrow=c(1,2))
 xtabs(time~interface+skill,data=search)
@@ -126,26 +107,36 @@ boxplot(time~interface, xlab="interface", ylab="time (sec)")
 boxplot(time~skill, xlab="skill", ylab="time (sec)")
 interaction.plot(interface,skill,time)
 interaction.plot(skill,interface,time)
+```
 
-## Exercise 2.3 ##
+###3. Test the null hypothesis that the search time is the same for all interfaces. (Beware that the levels of the factors are coded by numbers!)
+```{r}
 search$skill=as.factor(search$skill)
 search$interface=as.factor(search$interface)
 aovsearch=lm(time~interface+skill,data=search)
 anova(aovsearch)
+```
 
-## Exercise 2.4 ##
+###4. Estimate the time it takes a typical user of skill level 4 to find the product on the website if the website uses interface 
+```{r}
 summary(aovsearch)
+```
 
-## Exercise 2.5 ##
+###5. Make diagnostic plots to test the assumptions for the analysis. Comments?
+```{r}
 qqnorm(residuals(aovsearch))
 qqline(residuals(aovsearch))
 plot(fitted(aovsearch),residuals(aovsearch),xlab="Fitted",ylab="Residuals")
 abline(h=0)
+```
 
-## Exercise 2.6 ##
+###6. Perform the non-parametric Friedman test to test whether there is an effect of interface.
+```{r}
 friedman.test(time,interface,skill)
+```
 
-## Exercise 2.7 ##
+###7. Test the null hypothesis that the search time is the same for all interfaces by a one-way analysis of variance test, ignoring the variable skill. Is it right/wrong or useful/not useful to perform this test on this dataset? What assumption on the way the data were obtained is necessary for this test to be valid, and was this assumption met?
+```{r}
 search_noskill=search[,-c(2)]
 search_noskill$interface=as.factor(search_noskill$interface)
 aovsearch_noskill=lm(time~interface,data=search_noskill)
@@ -153,7 +144,11 @@ anova(aovsearch_noskill)
 ```
 
 
-EXERCISE 3
+##EXERCISE 3
+```{r}
+cream = read.table("input/cream.txt", header=TRUE, quote="\"")
+```
+
 The file cream.txt contains data on an experiment to produce sour cream.
 Yogurt was placed in sweet cream, and yogurt bacteria were allowed to develop.
 Interest was in their number. Bacteria produce lactic acid, and as a surrogate
@@ -166,57 +161,46 @@ With each batch each of five types of starter was used, with the yogurt placed
 in one of the five positions. The combinations of levels of three factors formed
 a three-dimensional latin square.
 The data are obtained in the file cream.txt.
-1. Analyse the data in a three-way experiment without interactions: use the
-model formula acidity∼starter+batch+position. (Beware to include
-the explanatory variables as factors in the analysis.) Formulate the conclusions.
-2. Produce a table of p-values for testing all hypotheses H0 : αi = αi
-0
-on equality of differences of the main effects for starter simultaneously
-(i, i0 ∈ {1, 2, . . . , 5}). Which starters lead to significantly different acidity?
-Interpret.
-2
-3. A p-value for the test H0 : α2 = α1 is also in the output of summary in
-2). What is it? Is it coincidence that it is smaller than the simultaneous
-p-value?
-4. Produce a table of confidence intervals for testing all differences αi−αi
-0 of
-the main effects for starter with simultaneous confidence level 95% (i, i0 ∈
-{1, 2, . . . , 5}). Which intervals do not contain the number 0? Comment.
-
+###1. Analyse the data in a three-way experiment without interactions: use the model formula acidity∼starter+batch+position. (Beware to include the explanatory variables as factors in the analysis.) Formulate the conclusions.
 ```{r}
-#############################
-# Assignment 4 - Exercise 3 #
-#############################
-
-## Read file cream.txt
-cream = read.table("input/cream.txt", header=TRUE, quote="\"")
-
-## Exercise 3.1 ##
 attach(cream)
 cream$batch=as.factor(cream$batch)
 cream$position=as.factor(cream$position)
 cream$starter=as.factor(cream$starter)
 aovcream=lm(acidity~starter+batch+position,data=cream)
 anova(aovcream)
+```
 
-## Exercise 3.2 ##
+###2. Produce a table of p-values for testing all hypotheses H0 : αi = αi 0 on equality of differences of the main effects for starter simultaneously (i, i0 ∈ {1, 2, . . . , 5}). Which starters lead to significantly different acidity? Interpret.
+```{r}
 summary(aovcream)
+```
 
-## Exercise 3.3 ##
+
+###3. A p-value for the test H0 : α2 = α1 is also in the output of summary in 2). What is it? Is it coincidence that it is smaller than the simultaneous p-value?
+```{r}
+
 library(multcomp)
 multcream=glht(aovcream,linfct=mcp(starter="Tukey"))
 summary(multcream)
+```
 
-## Exercise 3.4 ##
+###4. Produce a table of confidence intervals for testing all differences αi−αi 0 of the main effects for starter with simultaneous confidence level 95% (i, i0 ∈ {1, 2, . . . , 5}). Which intervals do not contain the number 0? Comment.
+
+```{r}
+
 summary(aovcream)
 summary(multcream)
 
-## Exercise 3.5 ##
 confint(multcream)
 
 ```
 
-EXERCISE 4
+##EXERCISE 4
+```{r}
+
+```
+
 In a study on the effect of feedingstuffs on lactation a sample of nine cows
 were fed with two types of food, and their milk production was measured. All
 cows were fed both types of food, during two periods, with a neutral period
@@ -224,19 +208,21 @@ in-between to try and wash out carry-over effects. The order of the types of
 food was randomized over the cows.
 The observed data can be found in the file cow.txt, where A and B refer to
 the types of feedingstuffs.
-1. Test whether the type of feedingstuffs influences milk production using an
-ordinary “fixed effects” model, fitted with lm.
-2. Estimate the difference in milk production.
-3. Repeat 1. and 2. by performing a mixed effects analysis, modelling the
-cow effect as a random effect (use the function lmer). Compare your
-results to the results found by using a fixed effects model.
-4. Study the commands:
+
+###1. Test whether the type of feedingstuffs influences milk production using an ordinary “fixed effects” model, fitted with lm.
+###2. Estimate the difference in milk production.
+###3. Repeat 1. and 2. by performing a mixed effects analysis, modelling the cow effect as a random effect (use the function lmer). Compare your results to the results found by using a fixed effects model.
+###4. Study the commands:
 attach(cow)
 t.test(milk[treatment=="A"],milk[treatment=="B"],paired=TRUE)
 Does this produce a valid test for a difference in milk production? Is its
 conclusion compatible with the one obtained in 1.? Why?
-3
-\
+
+
+
+
+
+***
 Experimental Design and Data Analysis: Assignment 5
 This assignment consists of 3 exercises. Throughout this assignment tests should
 be performed using a level of 0.05.
