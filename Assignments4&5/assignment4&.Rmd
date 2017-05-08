@@ -311,6 +311,7 @@ oxidant as the response variable. Do this as follows.
 ##EXERCISE 3
 ```{r}
 expensescrime = read.table("expensescrime.txt", header=TRUE, quote="\"")
+attach(expensescrime)
 ```
 
 The data in expensescrime were obtained to determine factors related to state
@@ -324,20 +325,115 @@ crime, lawyers, employ and pop as independent variables. Present your final
 model. Your analysis should at least include:
 ###a. investigation of potential or influence points
 ```{r}
+# use step up or step down 
+# plot(expensescrime)
+pairs(expensescrime[2:7])
+
 
 ```
+according to the pairs graph expend and almost every other variable has some outliers so we use cooks distance to see this influence poits more clearly
+```{r}
+fit0 = lm(expend ~ bad + crime + lawyers +employ+pop)
+round(cooks.distance(fit0),2)
+plot(1:51,cooks.distance(fit0))
+```
+we see that 5, 8, 35 and 44 are close or higher than 1 and therfore influencal 
+
+using car library
+```{r}
+library(car)
+avPlots(fit0)
+cutoff <- 4/((nrow(expensescrime)-length(fit0$coefficients)-2)) 
+plot(fit0, which=4, cook.levels=cutoff)
+influencePlot(fit0,	id.method="identify", main="Influence Plot", sub="Circle size is proportial to Cook's Distance" )
+```
+big circles show the influencal points that are close to 1 from 0.5 to 0.7 this confirms the previous findings
+
 
 ###b. investigation of problems due to collinearity
+we compare xi and xj and if they have large variance and large confidence interval then they are colinear
+for multiple variables we can use laso but not in this course
+scatter plot X1 against all other x 
+calculate linear corelation for all combinations check if they are far from 0
+using cor fucntion we see pairwise colinearity and the ones near 1 are co linear
+
 ```{r}
+round(cor(expensescrime[,3:7]),2)
 
 ```
+results show strong corelation between pop and bad as well as pop and employ
+to clarfy we will also use scatter plots to check it visually
+```{r}
+scatter.smooth(pop,bad)
+scatter.smooth(pop,employ)
+scatter.smooth(bad,employ)
+```
+scatter plot confirms our observation about co linear variables
 
 ###c. investigation of residuals.
 ```{r}
-
+fit1 = lm(expend ~ bad + crime + lawyers +employ+pop)
+summary(fit1)
 ```
+we notice crime is not significant so we step down 
+```{r}
+fit2 = lm(expend ~ bad  + lawyers +employ+pop)
+summary(fit2)
+```
+we notice  =R squared reduces slightly but no signifucant reduction
+since we know pop and bad are co linear we remove one 
+```{r}
+fit3 = lm(expend ~ bad + crime + lawyers +employ)
+summary(fit3)
+```
+bad and crime lost their significance so we step down by removing them
+```{r}
+fit4 = lm(expend ~ lawyers +employ)
+summary(fit4)
+```
+now the R squered is still  high and close to previous models while we only have lawyers and employ as our most significant values
+
+we are refitting the data using step up this time starting with the first variable bad
+```{r}
+fit1 = lm(expend ~ bad)
+summary(fit1)
+```
+next we add crime 
+```{r}
+fit2 = lm(expend ~ bad +crime)
+summary(fit2)
+```
+the R squered increases very slightly but crime has no significance so we dont concider it 
+```{r}
+fit3 = lm(expend ~ bad + lawyers )
+summary(fit3)
+```
+with R squered at 0.94 we have a huge increase but the model shows that bad lost its significance so we remove it and we keep lawyer and add the next one 
+```{r}
+fit3 = lm(expend ~ lawyers + employ )
+summary(fit3)
+```
+we see another increase in R squered and both lawyer and emply are significant so we add our final attribute
+```{r}
+fit4 = lm(expend ~ lawyers + employ +pop )
+summary(fit4)
+```
+There is a slight increase in R squered but pop has no siginificance
 
 You may use all techniques mentioned on the lecture slides. State clearly all
 the choices you make during the regression analysis, including arguments for all
 your choices. (Note that there are several strategies possible!)
-5
+
+ the best model for step up is fit3 = lm(expend ~ lawyers + employ ) with Multiple R-squared:  0.9632
+this compares to  fit4 = lm(expend ~ lawyers +employ) for step down with Multiple R-squared:  0.9632 
+both methods resulted in the same model
+
+finaly we plot the residuals to see if they are curved 
+```{r}
+plot(residuals(fit3),lawyers)
+plot(residuals(fit3),employ)
+```
+
+
+
+
