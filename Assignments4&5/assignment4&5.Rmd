@@ -3,125 +3,144 @@ title: "R Notebook"
 output: html_notebook
 ---
 ***
+
 #Experimental Design and Data Analysis: Assignment 4
-This assignment consists of 4 exercises. Throughout this assignment tests should
-be performed using a level of 0.05. You will need to install the R-packages
-multcomp and lme4, which are not included in the standard distribution of R.
-To use the package either choose multcomp and lme4 in menu Packages or type
+## Introduction
+
+In the present document, the results for the third and fourth assignment of the EDDA course are presented.
+
+## Assignment 4
+
+First of all, we load the libraries needed for the assignments.
+
+```{r}
+library(mvtnorm)
 library(multcomp)
 library(lme4)
-Installing is a one-time task, loading the package is necessary at every R session.
-## EXERCISE 1
-```{r}
-bread = read.table("bread.txt", header=TRUE, quote="\"")
-names(bread)[2] = "temperature"
 ```
 
-If left alone bread will become moldy, rot or decay otherwise. To investigate
-the influence of temperature and humidity on this process, the time to decay
-was measured for 18 slices of white bread, which were placed in 3 different
-environments and humidified or not.
-The data are given in the file bread.txt, with the first column time to
-decay in hours, the second column the environment (cold, warm or intermediate
-temperature) and the third column the humidity.
-###1. The 18 slices came from a single loaf, but were randomized to the 6 combinations of conditions. Present an R-code for this randomization process.
+### Exercise 1
 
 ```{r}
-# 18 slices, 6 combinations (3 env, 2 humid), 3 slices per combination
-#18 slices of white bread, which were placed in 3 different environments and humidified or not.
+bread = read.table('bread.txt')
+environment=as.factor(bread$environment)
+humidity=as.factor(bread$humidity)
+hours=as.numeric(bread$hours)
+```
+
+#### 1
+
+Here after is a randomization process for this database. The first element is temperature, with cold=1, intermediate=2 and warm=3; the second, humidity, where dry=1 and wet=2; and finally, the third is the time to decay in hours.
+
+```{r}
 I=3; J=2; N=3;
-rbind(rep(1:I,each=N*J), rep(1:J,N*I), sample(1:(N*I*J)))
-
+rand=sample(50:500, N*I*J)
+rbind(rep(1:I,each=N*J), rep(1:J,N*I), rand)
 ```
+#### 2
 
-###2. Make two boxplots of hours versus the two factors and two interaction plots (keeping the two factors fixed in turn).
 ```{r}
-boxplot(hours~temperature,data=bread)
+boxplot(hours~environment,data=bread)
+```
+```{r}
 boxplot(hours~humidity,data=bread)
-
 ```
 
-###3. Perform an analysis of variance to test for effect of the factors temperature, humidity, and their interaction. Describe the interaction effect in words.
 ```{r}
-attach(bread)
-interaction.plot(temperature,humidity,hours)
-interaction.plot(humidity,temperature,hours)
+interaction.plot(environment,humidity,hours)
 ```
-
-###4. Which of the two factors has the greatest (numerical) influence on the decay? Is this a good question?
 ```{r}
-bread$temperature=as.factor(bread$temperature)
-bread$humidity=as.factor(bread$humidity)
-breadaov=lm(hours~temperature*humidity,data=bread)
-anova(breadaov)
+interaction.plot(humidity,environment,hours)
 ```
+#### 3
 
-###5. Check the model assumptions by using relevant diagnostic tools. Are there any outliers?
+We will now perform an analysis of variance to test for effect of the factors temperature, humidity, and their interaction.
 
 ```{r}
+breadvar=lm(hours~environment*humidity,data=bread)
+anova(breadvar)
+```
+The analysis of variance above gives us the coefficients for the linear model. As it can be seen in the F value column, the coefficient related to the environment temperature has a value of 233.685, while the one related to humidity had a value of 62.296, which is almost four times lower. Their interaction had a value of 64.796, which is a value very close to the coefficient attached to humidity alone.
 
+#### 4
 
-## Exercise 1.6 ##
-contrasts(bread$temperature)=contr.sum
-contrasts(bread$humidity)=contr.sum
-breadaov2=lm(hours~temperature*humidity,data=bread)
-summary(breadaov2)
+```{r}
+summary(breadvar)
+```
+Here, we observe in more details the coefficients for each one of the classes in each variable. In general, when the humidity is wet, it affects positively the hours for decay with coefficient 72.00; however, when combined to an intermediate or warm environment temperature, these coefficients drop to -180.00and -268.00, respectively. However, the environment temperature when intermediate or warm, affect both ways negatively the hours for decay with coefficients -124.00 and -100.00, respectively. Thus, it is not correct to afirm that either one or the other variable has the greatest numerical influence on decay, as it has been observed that the importante of humidity changes if combined with certain conditions of the environment temperature.
 
-## Exercise 1.7 ##
-qqnorm(residuals(breadaov2))
-qqline(residuals(breadaov2))
+#### 5
 
-## Exercise 1.8 ##
-plot(fitted(breadaov2),residuals(breadaov2),xlab="Fitted",ylab="Residuals")
+The following procedure will help us to look for outliers in the dataset.
+
+```{r}
+qqnorm(residuals(breadvar))
+qqline(residuals(breadvar))
+
+plot(fitted(breadvar2),residuals(breadvar2),xlab="Fitted",ylab="Residuals")
 abline(h=0)
+```
+From the last figure, it is clear that most of points have residuals in the linear model, however it two extreme points could be considered as outliers, one with value around 40 and the one with value around -50.
 
+
+
+### Exercise 2
+
+```{r}
+search = read.table('search.txt')
+time=as.numeric(search$time)
+skill=as.numeric(search$skill)
+interface=as.numeric(search$interface)
 ```
 
+#### 1
 
+Here after is a randomization process for this database. The first element is skill; the second, interface; and finally, the third is the time to find the product.
 
-##EXERCISE 2
 ```{r}
-search = read.table("search.txt", header=TRUE, quote="\"")
+I=5; J=3; N=1;
+rand=sample(15:30, I*J)
+rbind(rep(1:I,each=1), rep(1:J,each=5), rand)
 ```
 
-A researcher is interested in the time it takes a student to find a certain product
-on the internet using a search engine. There are three different types of interfaces
-with the search engine and especially the effect of these interfaces is of
-importance. There are five different types of students, indicating their level of
-computer handling (the lower the value of this indicator, the better the computer
-handling of the corresponding student). Fifteen students are selected; three
-from each group with a certain level of computer handling.
-###1. Number the selected students 1 to 15 and show how the students could be randomized to the interfaces in a randomized block design, by using R. 1 The experiment was run according to a randomized block design, as described. The data is given in the file search.txt.
+#### 2
+
+Here after, we will create a contigency table to better see how the two  variables "skill" and "interface" are correlated. In general, when the skill values are lower - thus, higher skills - the time to find the product is lower. Furthermore, the effect of the interfaces is also important as the time to find the product seems to increase, in general, in the direction of Interface 1-> Interface 2-> Interface 3.
+
 ```{r}
-I=3;B=5;N=1
-for (i in 1:B) {print(sample(1:(N*I)))}
+xtabs(time~interface+skill)
 ```
 
-###2. Make some graphical summaries of the data. Are any interactions between interface and skill apparent?
+Now, we will visualize the boxplot of the two variables in regard to time. The two boxplots do help us maintain our statements made so far, as it can be seen in the two figures. 
+
 ```{r}
-attach(search)
 par(mfrow=c(1,2))
-xtabs(time~interface+skill,data=search)
-boxplot(time~interface, xlab="interface", ylab="time (sec)")
-boxplot(time~skill, xlab="skill", ylab="time (sec)")
+boxplot(time~interface, xlab="Interface", ylab="time")
+boxplot(time~skill, xlab="Skill", ylab="time")
+```
+
+```{r}
 interaction.plot(interface,skill,time)
 interaction.plot(skill,interface,time)
 ```
+Finally, we create interaction plots to better understand how these variables interact. Fixing the values of the skill values, time increases when going from interface 1 to 2, except for when the skills have value 1. The same can be said for when going from interface 2 to 3, except for when the skills have value 4.
+Similarly, we analyse the interaction plot now fixing the interface values. The first interface seems to be faster used by those with skill 2; the second, by those with skill 1, and the third likewise. However, interface 3 seems to be also user-friendly for people with skill of 4, as there is an important downward slope from skill 3 to 4.
 
-###3. Test the null hypothesis that the search time is the same for all interfaces. (Beware that the levels of the factors are coded by numbers!)
+#### 3
+
 ```{r}
-search$skill=as.factor(search$skill)
-search$interface=as.factor(search$interface)
-aovsearch=lm(time~interface+skill,data=search)
-anova(aovsearch)
+searchvar=lm(time~interface+skill,data=search)
+anova(searchvar)
 ```
 
-###4. Estimate the time it takes a typical user of skill level 4 to find the product on the website if the website uses interface 
+#### 4
+
 ```{r}
 summary(aovsearch)
 ```
 
-###5. Make diagnostic plots to test the assumptions for the analysis. Comments?
+#### 5
+
 ```{r}
 qqnorm(residuals(aovsearch))
 qqline(residuals(aovsearch))
@@ -129,12 +148,14 @@ plot(fitted(aovsearch),residuals(aovsearch),xlab="Fitted",ylab="Residuals")
 abline(h=0)
 ```
 
-###6. Perform the non-parametric Friedman test to test whether there is an effect of interface.
+#### 6
+
 ```{r}
 friedman.test(time,interface,skill)
 ```
 
-###7. Test the null hypothesis that the search time is the same for all interfaces by a one-way analysis of variance test, ignoring the variable skill. Is it right/wrong or useful/not useful to perform this test on this dataset? What assumption on the way the data were obtained is necessary for this test to be valid, and was this assumption met?
+#### 7
+
 ```{r}
 search_noskill=search[,-c(2)]
 search_noskill$interface=as.factor(search_noskill$interface)
@@ -142,57 +163,40 @@ aovsearch_noskill=lm(time~interface,data=search_noskill)
 anova(aovsearch_noskill)
 ```
 
+### Exercise 3
 
-##EXERCISE 3
 ```{r}
-cream = read.table("cream.txt", header=TRUE, quote="\"")
+cream = read.table('cream.txt')
+acidity=as.factor(cream$acidity)
+batch=as.factor(cream$batch)
+position=as.factor(cream$position)
+starter=as.factor(cream$starter)
 ```
 
-The file cream.txt contains data on an experiment to produce sour cream.
-Yogurt was placed in sweet cream, and yogurt bacteria were allowed to develop.
-Interest was in their number. Bacteria produce lactic acid, and as a surrogate
-for their number, the acidity of the cream was measured. Interest was in the
-effect of the type of yogurt used as a starter. The mixtures of yogurt and
-sweet cream were kept at constant temperature in a yogurt maker, in which
-five different positions could be used. The experiment was carried out with
-five batches of sweet cream, which were meant to have the same composition.
-With each batch each of five types of starter was used, with the yogurt placed
-in one of the five positions. The combinations of levels of three factors formed
-a three-dimensional latin square.
-The data are obtained in the file cream.txt.
-###1. Analyse the data in a three-way experiment without interactions: use the model formula acidity∼starter+batch+position. (Beware to include the explanatory variables as factors in the analysis.) Formulate the conclusions.
+#### 1
+
 ```{r}
-attach(cream)
-cream$batch=as.factor(cream$batch)
-cream$position=as.factor(cream$position)
-cream$starter=as.factor(cream$starter)
 aovcream=lm(acidity~starter+batch+position,data=cream)
 anova(aovcream)
 ```
+#### 2
 
-###2. Produce a table of p-values for testing all hypotheses H0 : αi = αi 0 on equality of differences of the main effects for starter simultaneously (i, i0 ∈ {1, 2, . . . , 5}). Which starters lead to significantly different acidity? Interpret.
 ```{r}
 summary(aovcream)
 ```
+#### 3
 
-
-###3. A p-value for the test H0 : α2 = α1 is also in the output of summary in 2). What is it? Is it coincidence that it is smaller than the simultaneous p-value?
 ```{r}
-# install.packages(multcomp)
 library(multcomp)
 multcream=glht(aovcream,linfct=mcp(starter="Tukey"))
 summary(multcream)
-```
-
-###4. Produce a table of confidence intervals for testing all differences αi−αi 0 of the main effects for starter with simultaneous confidence level 95% (i, i0 ∈ {1, 2, . . . , 5}). Which intervals do not contain the number 0? Comment.
-
-```{r}
-
 summary(aovcream)
 summary(multcream)
+```
+#### 4
 
+```{r}
 confint(multcream)
-
 ```
 
 ##EXERCISE 4
@@ -325,11 +329,7 @@ crime, lawyers, employ and pop as independent variables. Present your final
 model. Your analysis should at least include:
 ###a. investigation of potential or influence points
 ```{r}
-# use step up or step down 
-# plot(expensescrime)
 pairs(expensescrime[2:7])
-
-
 ```
 according to the pairs graph expend and almost every other variable has some outliers so we use cooks distance to see this influence poits more clearly
 ```{r}
@@ -434,6 +434,9 @@ plot(residuals(fit3),lawyers)
 plot(residuals(fit3),employ)
 ```
 
-
-
-
+finalyl checking the model with y and the fitted y 
+```{r}
+plot(residuals(fit3),expend)
+plot(residuals(fit3),fitted(fit3))
+```
+both graphs have the same spread
