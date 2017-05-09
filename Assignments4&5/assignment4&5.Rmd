@@ -77,7 +77,7 @@ The following procedure will help us to look for outliers in the dataset.
 qqnorm(residuals(breadvar))
 qqline(residuals(breadvar))
 
-plot(fitted(breadvar2),residuals(breadvar2),xlab="Fitted",ylab="Residuals")
+plot(fitted(breadaov2),residuals(breadaov2),xlab="Fitted",ylab="Residuals")
 abline(h=0)
 ```
 From the last figure, it is clear that most of points have residuals in the linear model, however it two extreme points could be considered as outliers, one with value around 40 and the one with value around -50.
@@ -202,6 +202,7 @@ confint(multcream)
 ##EXERCISE 4
 ```{r}
 cow = read.table("cow.txt", header=TRUE, quote="\"")
+attach(cow)
 ```
 
 In a study on the effect of feedingstuffs on lactation a sample of nine cows
@@ -214,17 +215,22 @@ the types of feedingstuffs.
 
 ###1. Test whether the type of feedingstuffs influences milk production using an ordinary “fixed effects” model, fitted with lm.
 ```{r}
-
+fit_cow = lm(milk ~ treatment)
+anova(fit_cow)
+summary(fit_cow)
 ```
+because R squered is very low and  the p value is 0.9 for treatment.
 
 ###2. Estimate the difference in milk production.
 ```{r}
-
+by(cow$milk, cow$id, diff,  simplify = TRUE)
 ```
 
 ###3. Repeat 1. and 2. by performing a mixed effects analysis, modelling the cow effect as a random effect (use the function lmer). Compare your results to the results found by using a fixed effects model.
 ```{r}
-
+library(lme4)
+cowlmer=lmer(milk~treatment+order+per+(1|id),data=cow,REML=FALSE)
+summary(cowlmer)
 ```
 
 ###4. Study the commands: attach(cow)
@@ -235,7 +241,7 @@ the types of feedingstuffs.
 attach(cow)
 t.test(milk[treatment=="A"],milk[treatment=="B"],paired=TRUE)
 ```
-
+comparing the result in part 1 with p value of 0.967 and result in part 4 with p value of 0.82 both null hypotesis are rejected and the models do not show that the true difference in means of treatment equals to 0
 
 
 
@@ -267,6 +273,7 @@ was administered in two different doses.
 
 ###3. Perform a permutation test in order to test whether the different medicins work equally well against nausea. Permute the medicin labels for this purpose. Use as test statistic the chisquare test statistic for contingency tables, which can be extracted from the output of chisq.test: chisq.test(xtabs(∼medicin+nausea))[[1]].
 ```{r}
+chisq.test: chisq.test(xtabs(∼medicin+nausea))[[1]].
 
 ```
 
