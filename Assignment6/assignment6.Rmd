@@ -7,23 +7,29 @@ Experimental Design and Data Analysis: Assignment 6
 This assignment consists of 3 exercises. Throughout this assignment tests should be performed using a level of 0.05.
 ##EXERCISE 1
 ```{r}
-
+fruitflies = read.table('fruitflies.txt',header = TRUE)
+attach(fruitflies)
 ```
 
 To investigate the effect of sexual activity on longevity of fruit flies, 75 male fruit flies were divided randomly in three groups of 25. The fruit flies in the first group were kept solitary, those in the second were kept together with one virgin female fruit fly per day, and those in the third group were kept together with eight virgin female fruit flies a day. In the data-file fruitflies.txt the three groups are labelled isolated, low and high. The number of days until death (longevity) was measured for all flies, as was the length of their thorax.
 ###1. Add a column loglongevity to the data-frame, containing the logarithm of the number of days until death. Use this as the outcome variable in the following.
 ```{r}
-
+fruitflies$loglongevity <- log(as.numeric(fruitflies$longevity))
 ```
 
 ###2. Make an informative plot of the data.
 ```{r}
 
+
+# plot(thorax~longevity,pch=unclass(activity))
+plot(longevity~thorax,pch=as.character(activity))
 ```
 
 ###3. Investigate whether sexual activity influences longevity by performing a statistical test, without taking the thorax length into account.
 ```{r}
+fruitflies$activity <- as.factor(fruitflies$activity)
 
+anova(lm(longevity~activity,data=fruitflies))
 ```
 
 ###4. Does sexual activity increase or decrease longevity? What are the estima- ted longevities for the three conditions? To answer these questions, use the analysis as under 3), without taking thorax length into account.
@@ -33,7 +39,7 @@ To investigate the effect of sexual activity on longevity of fruit flies, 75 mal
 
 ###5. Investigate whether sexual activity influences longevity by performing a statistical test, now including thorax length as an explanatory variable into the analysis.
 ```{r}
-
+anova(lm(longevity~activity+thorax,data=fruitflies))
 ```
 ###6. Does sexual activity increase or decrease longevity? What are the esti- mated longevities for the three conditions, for a fly with average thorax length? And what are they for a typical fly as small as the smallest in the data set? To answer these questions, use the analysis as under 5), which includes thorax length.
 ```{r}
@@ -55,6 +61,9 @@ To investigate the effect of sexual activity on longevity of fruit flies, 75 mal
 ```{r}
 
 ```
+
+
+
 ##EXERCISE 2
 ```{r}
 
