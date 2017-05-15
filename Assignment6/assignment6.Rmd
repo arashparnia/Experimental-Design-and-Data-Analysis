@@ -21,15 +21,14 @@ fruitflies$loglongevity <- log(as.numeric(fruitflies$longevity))
 ```{r}
 
 
-# plot(thorax~longevity,pch=unclass(activity))
+plot(thorax~longevity,pch=unclass(activity))
 plot(longevity~thorax,pch=as.character(activity))
 ```
 
 ###3. Investigate whether sexual activity influences longevity by performing a statistical test, without taking the thorax length into account.
 ```{r}
-fruitflies$activity <- as.factor(fruitflies$activity)
-
-anova(lm(longevity~activity,data=fruitflies))
+fit1 = lm(longevity~activity,data=fruitflies)
+anova(fit1)
 ```
 
 ###4. Does sexual activity increase or decrease longevity? What are the estima- ted longevities for the three conditions? To answer these questions, use the analysis as under 3), without taking thorax length into account.
@@ -39,7 +38,8 @@ anova(lm(longevity~activity,data=fruitflies))
 
 ###5. Investigate whether sexual activity influences longevity by performing a statistical test, now including thorax length as an explanatory variable into the analysis.
 ```{r}
-anova(lm(longevity~activity+thorax,data=fruitflies))
+fit2= lm(longevity~activity+thorax,data=fruitflies)
+anova(fit2)
 ```
 ###6. Does sexual activity increase or decrease longevity? What are the esti- mated longevities for the three conditions, for a fly with average thorax length? And what are they for a typical fly as small as the smallest in the data set? To answer these questions, use the analysis as under 5), which includes thorax length.
 ```{r}
@@ -47,7 +47,10 @@ anova(lm(longevity~activity+thorax,data=fruitflies))
 ```
 ###7. How does thorax length influence longevity? Graphically investigate whe- ther this dependence is similar under all three conditions of sexual activity.
 ```{r}
-
+plot(longevity~thorax,pch=unclass(activity))
+abline(lm(longevity~thorax,data=fruitflies[fruitflies$activity=='isolated',]))
+abline(lm(longevity~thorax,data=fruitflies[fruitflies$activity=='low',]))
+abline(lm(longevity~thorax,data=fruitflies[fruitflies$activity=='high',]))
 ```
 ###8. Which of the two analyses, without or with thorax length, do you prefer? Is one of the analyses wrong? (To answer the last question, carefully (re)read the description of the design of the experiment.)
 ```{r}
@@ -55,7 +58,8 @@ anova(lm(longevity~activity+thorax,data=fruitflies))
 ```
 ###9. Verify normality and heteroscedasticity by making a normal QQ-plot of the residuals, and a residuals versus fitted plot, for the analysis that in- cludes thorax length.
 ```{r}
-
+qqnorm(residuals(fit2))
+plot(fitted(fit2),residuals(fit2))
 ```
 ###10. Perform the ancova analysis with the number of days as the outcome, rather than its logarithm. Verify normality and heteroscedasticity of the residuals of this analysis. Was it wise to use the logarithm as outcome?
 ```{r}
@@ -66,16 +70,36 @@ anova(lm(longevity~activity+thorax,data=fruitflies))
 
 ##EXERCISE 2
 ```{r}
-
+psi_data = read.table('psi.txt',header = TRUE)
 ```
 To study the effect of a new teaching method called “personalized system of instruction” (psi), 32 students were randomized to either receive psi or to be taught using the existing method. At the end of the teaching period the success of the teaching method was assessed by giving the students a difficult assign- ment, which they could pass or not. The average grade of the students (gpa on a scale of 0–4, with 4 being the best grade) were also available for analysis.
 The data can be found in the file psi.txt.
 ###1. Study the data and give a few (> 1) summaries (graphics or tables).
 ```{r}
+summary(psi_data)
+# qqnorm(gpa)
+tot=xtabs(~passed+psi,data=psi_data); tot
+hist(psi_data[,3],main='gpa')
+
+ round(xtabs(gpa~passed+psi,data=psi_data)/tot,2)
+ 
+totgpa=xtabs(~gpa,data=psi_data)
+barplot(xtabs(psi~gpa,data=psi_data)/totgpa)
+
 
 ```
 ###2. Fit a logistic regression model with both explanatory variables.
 ```{r}
+psi_data$gpa2=psi_data$gpa^2
+psiglm=glm(psi~gpa+gpa2+passed,data=psi_data,family=binomial)
+summary(psiglm)
+
+psi_data$gpa=factor(psi_data$gpa)
+psi_data$psi=factor(psi_data$psi)
+psi_data$passed=factor(psi_data$passed)
+psiglm2=glm(psi~gpa+passed,data=psi_data,family=binomial)
+summary(psiglm2)
+
 
 ```
 ###3. Does psi work?
@@ -84,7 +108,7 @@ The data can be found in the file psi.txt.
 ```
 ###4. Estimate the probability that a student with a gpa equal to 3 who receives psi passes the assignment. Estimate the same probability for a student who does not receive psi.
 ```{r}
-
+plot(c(0,coef(psiglm2)[13:27]),type="l")
 ```
 ###5. Estimate the relative change in odds of passing the assignment rendered by instructing students with psi rather than the standard method (for an arbitrary student). What is the interpretation of this number? Is it dependent on gpa?
 ```{r}
@@ -112,7 +136,7 @@ fisher.test(x)
 
 ##EXERCISE 3
 ```{r}
-
+africa = read.table('africa.txt',header = TRUE)
 ```
 To study the influence of different political and geographical variables on the number of military coups, these data are collected for several Sub Saharan Af- rican countries in the file africa.txt. The meaning of the different variables is miltcoup — number of successful military coups from independence to 1989 oligarchy — number years country ruled by military oligarchy from indepen- dence to 1989
 pollib — Political liberalization (0 = no civil rights for political expression, 1 = limited civil rights for expression but right to form political parties, 2 = full civil rights)
@@ -124,6 +148,27 @@ numelec — Total number of legislative and presidential elections numregim — 
 In this exercise you will fit a regression model to these data using Poisson regression, but first Poisson distributions are studied.
 ###1. Study (graphically) some different Poisson distributions using Poisson samples generated by rpois(n,lambda), varying both n and (positive) lambda.
 ```{r}
+par(mfrow=c(4,4))
+
+hist(rpois(10,0.5))
+hist(rpois(10,5))
+hist(rpois(10,100))
+hist(rpois(10,1000))
+
+hist(rpois(100,0.5))
+hist(rpois(100,5))
+hist(rpois(100,100))
+hist(rpois(100,1000))
+
+hist(rpois(1000,0.5))
+hist(rpois(1000,5))
+hist(rpois(1000,100))
+hist(rpois(1000,1000))
+
+hist(rpois(10000,0.5))
+hist(rpois(10000,5))
+hist(rpois(10000,100))
+hist(rpois(10000,1000))
 
 ```
 ###2. Two distributions are in the same location-scale family if there is a scale- and-shift transformation that maps one to the other. Investigate whether different Poisson distributions are in the same location-scale family, like all normal distribution. Clearly explain your approach to this question, and your answer.
