@@ -8,7 +8,7 @@ This assignment consists of 3 exercises. Throughout this assignment tests should
 ##EXERCISE 1
 ```{r}
 fruitflies = read.table('fruitflies.txt',header = TRUE)
-attach(fruitflies)
+# attach(fruitflies)
 ```
 
 To investigate the effect of sexual activity on longevity of fruit flies, 75 male fruit flies were divided randomly in three groups of 25. The fruit flies in the first group were kept solitary, those in the second were kept together with one virgin female fruit fly per day, and those in the third group were kept together with eight virgin female fruit flies a day. In the data-file fruitflies.txt the three groups are labelled isolated, low and high. The number of days until death (longevity) was measured for all flies, as was the length of their thorax.
@@ -77,27 +77,26 @@ The data can be found in the file psi.txt.
 ###1. Study the data and give a few (> 1) summaries (graphics or tables).
 ```{r}
 summary(psi_data)
-# qqnorm(gpa)
-tot=xtabs(~passed+psi,data=psi_data); tot
-hist(psi_data[,3],main='gpa')
+tot=xtabs(~gpa+psi,data=psi_data); tot
+hist(psi_data[,3],main='passed')
 
- round(xtabs(gpa~passed+psi,data=psi_data)/tot,2)
+ round(xtabs(passed~gpa+psi,data=psi_data)/tot,2)
  
 totgpa=xtabs(~gpa,data=psi_data)
-barplot(xtabs(psi~gpa,data=psi_data)/totgpa)
+barplot(xtabs(passed~gpa,data=psi_data)/totgpa)
 
 
 ```
 ###2. Fit a logistic regression model with both explanatory variables.
 ```{r}
 psi_data$gpa2=psi_data$gpa^2
-psiglm=glm(psi~gpa+gpa2+passed,data=psi_data,family=binomial)
+psiglm=glm(passed~gpa+gpa2+psi,data=psi_data,family=binomial)
 summary(psiglm)
 
 psi_data$gpa=factor(psi_data$gpa)
 psi_data$psi=factor(psi_data$psi)
 psi_data$passed=factor(psi_data$passed)
-psiglm2=glm(psi~gpa+passed,data=psi_data,family=binomial)
+psiglm2=glm(passed~gpa+psi,data=psi_data,family=binomial)
 summary(psiglm2)
 
 
@@ -108,8 +107,27 @@ summary(psiglm2)
 ```
 ###4. Estimate the probability that a student with a gpa equal to 3 who receives psi passes the assignment. Estimate the same probability for a student who does not receive psi.
 ```{r}
-plot(c(0,coef(psiglm2)[13:27]),type="l")
+# plot(c(0,coef(psiglm2)[13:27]),type="l")
+
+
+psi_data$gpa <- as.numeric(psi_data$gpa)
+psiglm=glm(passed~gpa+psi,data=psi_data,family=binomial)
+
+gpa3passed=data.frame(psi=factor(1),gpa=3)
+predict.glm(psiglm,gpa3passed,type="response")
+
+
+
 ```
+the passing factor with gpa 3 
+```{r}
+gpa3failed=data.frame(psi=factor(0),gpa=3)
+predict.glm(psiglm,gpa3failed,type="response")
+
+
+```
+the not passing factor with gpa 3 
+
 ###5. Estimate the relative change in odds of passing the assignment rendered by instructing students with psi rather than the standard method (for an arbitrary student). What is the interpretation of this number? Is it dependent on gpa?
 ```{r}
 
@@ -123,7 +141,9 @@ x
 fisher.test(x)
 ###6. Do this. What are the numbers 15 and 6 in this table? What is the conclusion?
 ```{r}
-
+x=matrix(c(3,15,8,6),2,2) 
+x
+fisher.test(x)
 ```
 ###7. Given the way the experiment was conducted, is this second approach wrong? Why or why not?
 ```{r}
@@ -177,14 +197,44 @@ hist(rpois(10000,1000))
 ```
 ###3. Perform Poisson regression on the full africa data, taking miltcoup as response variable.
 ```{r}
-
+africaglm_all=glm(miltcoup~oligarchy+ pollib+parties+pctvote+popn+size+numelec+numregim,family=poisson,data=africa)
+summary(africaglm_all)
 ```
 ###4. Use the step down approach (using output of the function summary) to reduce the number of explanatory variables.
 ```{r}
-
+africaglm=glm(miltcoup~oligarchy+ pollib+parties+pctvote+popn+size+numregim,family=poisson,data=africa)
+summary(africaglm)
 ```
+```{r}
+africaglm=glm(miltcoup~oligarchy+ pollib+parties+pctvote+popn+size,family=poisson,data=africa)
+summary(africaglm)
+```
+
+```{r}
+africaglm=glm(miltcoup~oligarchy+ pollib+parties+pctvote+popn,family=poisson,data=africa)
+summary(africaglm)
+```
+```{r}
+africaglm=glm(miltcoup~oligarchy+ pollib+parties+pctvote,family=poisson,data=africa)
+summary(africaglm)
+```
+```{r}
+africaglm=glm(miltcoup~oligarchy+ pollib+parties,family=poisson,data=africa)
+summary(africaglm)
+```
+
 ###5. Make one or more diagnostic plots of the deviance residuals for the model you have found in part (4). In case you see a certain pattern, check whether that is also present in the full model (using all explanatory variables), i.e. see whether is it due to deleting too many variables. Comment on the pattern (if possible).
 ```{r}
+par(mfrow=c(3,2))
+plot(fitted(africaglm),residuals(africaglm))
+plot(fitted(africaglm_all),residuals(africaglm_all))
+
+plot(log(fitted(africaglm)),residuals(africaglm))
+plot(log(fitted(africaglm_all)),residuals(africaglm_all))
+
+plot(log(fitted(africaglm)),residuals(africaglm,type="response"))
+plot(log(fitted(africaglm_all)),residuals(africaglm_all,type="response"))
 
 ```
 
+plots dont have any specifit structure so they are ok for first 4 plots and the final 2 plots show an increase of 
