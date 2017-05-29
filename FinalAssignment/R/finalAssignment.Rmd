@@ -1,0 +1,151 @@
+---
+title: "Final Assignment"
+output: html_notebook
+---
+
+Importing data from original databse
+```{r}
+length(which(mydata$click_bool == 1))
+mydata <- mydata[which(mydata$click_bool == 1),]
+length(mydata)
+```
+loading and saving
+```{r}
+
+
+
+
+load(file = "../Data/mydata.RData")
+# save(mydata,file = "../Data/mydata.RData")
+mydata <- data
+remove(data)
+```
+
+trim database
+```{r}
+mydata <- subset(mydata, select = -c(prop_brand_bool) )
+mydata <- subset(mydata, select = -c(position) )
+mydata <- subset(mydata, select = -c(srch_saturday_night_bool) )
+mydata <- subset(mydata, select = -c(random_bool) )
+mydata <- subset(mydata, select = -c(price_usd_normalized) )
+mydata <- subset(mydata, select = -c(Pclass) )
+mydata <- subset(mydata, select = -c(score) )
+
+```
+
+subsetting
+
+```{r}
+
+mydata <- mydata[which(mydata$srch_id < 1000),] 
+length((unique(mydata$srch_id)))
+median((unique(mydata$srch_id)))
+max(mydata$srch_id)
+```
+pairs plot
+```{r}
+df <- subset(mydata, select = -c(consumer))
+pairs(df)
+```
+
+```{r}
+qqnorm(mydata$price_usd)
+shapiro.test(mydata$price_usd)
+```
+not normally disterbuted 
+
+```{r}
+library(outliers)
+chisq.out.test(mydata$price_usd, variance = var(mydata$price_usd),opposite = TRUE)
+chisq.out.test(mydata$price_usd, variance = var(mydata$price_usd),opposite = FALSE)
+```
+
+removing outliers
+```{r}
+mydata <- mydata[which(mydata$price_usd < 1242 ),] 
+
+```
+
+
+```{r}
+par(mfrow=c(3,2));
+qqnorm(mydata$price_usd,main="price_usd")
+qqnorm(mydata$prop_starrating,main="prop_starrating")
+qqnorm(mydata$prop_review_score,main="prop_review_score")
+qqnorm(mydata$prop_location_score1,main="prop_location_score1")
+qqnorm(mydata$prop_location_score2,main="prop_location_score2")
+```
+```{r}
+par(mfrow=c(3,2));
+hist(mydata$price_usd,main="price_usd")
+hist(mydata$prop_starrating,main="prop_starrating")
+hist(mydata$prop_review_score,main="prop_review_score")
+hist(mydata$prop_location_score1,main="prop_location_score1")
+hist(mydata$prop_location_score2,main="prop_location_score2")
+```
+```{r}
+# df <- subset(mydata, select = -c(consumer,click_bool,srch_id,site_id,prop_id,))
+round(cor(df),3)
+```
+                    prop_starrating prop_review_score prop_location_score1 prop_location_score2 price_usd promotion_flag booking_bool
+prop_starrating                 1.00              0.31                 0.30                 0.05      0.47           0.19         0.00
+prop_review_score               0.31              1.00                 0.15                 0.04      0.22           0.06         0.12
+prop_location_score1            0.30              0.15                 1.00                 0.29      0.27           0.16         0.00
+prop_location_score2            0.05              0.04                 0.29                 1.00      0.02           0.03         0.11
+price_usd                       0.47              0.22                 0.27                 0.02      1.00          -0.01        -0.11
+promotion_flag                  0.19              0.06                 0.16                 0.03     -0.01           1.00         0.11
+booking_bool                    0.00              0.12                 0.00                 0.11     -0.11           0.11         1.00
+
+with 0.47 prop_starrating  has the highest colinearity with price_usd followed by  0.31 for prop_starrating and prop_review_score 
+
+
+```{r}
+
+```
+randomized block design
+```{r}
+xtabs(price_usd ~ prop_starrating + consumer ,data=mydata)
+xtabs(price_usd ~ prop_starrating + prop_review_score ,data=mydata)
+```
+
+```{r}
+attach(mydata)
+par(mfrow=c(3,3))
+boxplot(price_usd~prop_starrating); boxplot(price_usd~consumer) ; boxplot(price_usd~prop_review_score) 
+
+interaction.plot(prop_starrating,consumer,price_usd); interaction.plot(consumer,prop_starrating,price_usd) ; interaction.plot(prop_review_score,prop_starrating,price_usd) 
+```
+```{r}
+aovpen=lm(price_usd~prop_starrating+consumer,data=mydata)
+
+anova(aovpen)
+summary(aovpen)
+qqnorm(residuals(aovpen))
+plot(fitted(aovpen),residuals(aovpen))
+
+```
+```{r}
+aovpen=lm(price_usd~prop_starrating+prop_review_score,data=mydata)
+
+anova(aovpen)
+summary(aovpen)
+qqnorm(residuals(aovpen))
+plot(fitted(aovpen),residuals(aovpen))
+
+```
+
+prop_starrating is more significant than consumer type and prop_review_score but also both significant 
+
+```{r}
+
+aovpen=lm(price_usd~prop_review_score + consumer,data=mydata)
+
+anova(aovpen)
+summary(aovpen)
+qqnorm(residuals(aovpen))
+plot(fitted(aovpen),residuals(aovpen))
+
+```
+
+
+
