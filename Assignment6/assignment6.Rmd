@@ -21,13 +21,13 @@ fruitflies$loglongevity <- log(as.numeric(fruitflies$longevity))
 ```{r}
 
 
-plot(thorax~longevity,pch=unclass(activity))
-plot(longevity~thorax,pch=as.character(activity))
+plot(loglongevity~thorax,pch=unclass(activity),data = fruitflies)
+plot(loglongevity~thorax,pch=as.character(activity),data = fruitflies)
 ```
 
 ###3. Investigate whether sexual activity influences longevity by performing a statistical test, without taking the thorax length into account.
 ```{r}
-fit1 = lm(longevity~activity,data=fruitflies)
+fit1 = lm(loglongevity~activity,data=fruitflies)
 anova(fit1)
 ```
 

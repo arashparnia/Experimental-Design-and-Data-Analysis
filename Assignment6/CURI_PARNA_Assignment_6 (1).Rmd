@@ -1,0 +1,368 @@
+---
+title: "R Notebook assignment 6"
+output:
+  pdf_document: default
+  html_notebook: default
+---
+
+Experimental Design and Data Analysis: Assignment 6
+
+Fabio Curi Paix?o & Arash Parna 
+
+## EXERCISE 1
+
+We first load the file needed for this exercise.
+
+```{r}
+fruitflies = read.table('fruitflies.txt',header = TRUE)
+thorax=as.numeric(fruitflies$thorax)
+longevity=as.numeric(fruitflies$longevity)
+activity=as.factor(fruitflies$activity)
+```
+
+### 1 
+
+The log of the longevity is given as follows:
+
+```{r}
+fruitflies$loglongevity <- log(as.numeric(fruitflies$longevity))
+loglongevity=as.numeric(fruitflies$loglongevity)
+```
+
+From now on, the output variable will be "loglongevity", unless specified.
+
+### 2 
+
+Informative plots of the data are given here after.
+
+```{r}
+par(mfrow=c(1,2))
+plot(loglongevity~thorax,pch=unclass(activity))
+plot(loglongevity~thorax,pch=as.character(activity))
+```
+, where in the second plot the circles represent "high", triangles are "isolated" and the crosses are "low", which are outputs for "activity". 
+
+### 3
+
+We build the following intercept-free model:
+
+```{r}
+fit1 = lm(loglongevity~activity-1,data=fruitflies)
+summary(fit1)
+anova(fit1)
+fit1
+```
+By the results obtained from the intercept and the coefficients for isolated and low activities, it is safe to say that sexual activity influences loglongevity. Furthermore, the values in the last column of the summary show very low values, which confirm what has just been said.
+
+### 4
+
+The final model is given as follows:
+
+loglongevity = 3.60212*activityhigh + 4.11935*activityisolated + 3.99984*activitylow + error
+
+With these positive coefficients, it is safe to state that sexual activity increase loglongevity for the three cases. The estimated loglongevities in days for the three conditions are the following:
+
+loglongevity(high) = 3.60212*1 + 4.11935*0 + 3.99984*0 + error = 3.60212 + error
+
+loglongevity(isolated) = 3.60212*0 + 4.11935*1 + 3.99984*0 + error = 4.11935 + error
+
+loglongevity(low) = 3.60212*0 + 4.11935*0 + 3.99984*1 + error = 3.99984 + error
+
+### 5
+
+Now, we will build the model with both explanatory variables.
+
+```{r}
+fit2= lm(loglongevity~activity-1+thorax,data=fruitflies)
+summary(fit2)
+```
+
+The results of this new model induce us to think differently. The coefficients for the different sexual activities lowered, while the one for the thorax length has the highest coefficient. From the values in the last column, which are very low, it is still safe to state that both variables are influential in the model.
+
+### 6
+
+From this new model, sexual activity appears to decrease loglongevity. The final model is the following:
+
+loglongevity = 1.2189*activityhigh + 1.6289*activityisolated + 1.5046*activitylow + 2.9790*thorax + error
+
+The average and smallest thorax length in the dataset are the following:
+
+```{r}
+mean(thorax)
+min(thorax)
+```
+The loglongevity in days for a fly with average thorax length is the following:
+
+loglongevity(high)= 1.2189*1 + 1.6289*0 + 1.5046*0 + 2.9790*0.82 + error = 3.66 + error
+
+loglongevity(isolated)= 1.2189*0 + 1.6289*1 + 1.5046*0 + 2.9790*0.82 + error = 4.07 + error 
+
+loglongevity(low)= 1.2189*0 + 1.6289*0 + 1.5046*1 + 2.9790*0.82 + error = 3.95 + error
+
+And for a fly with the smallest thorax length:
+
+loglongevity(high)= 1.2189*1 + 1.6289*0 + 1.5046*0 + 2.9790*0.64 + error = 3.12 + error
+
+loglongevity(isolated)= 1.2189*0 + 1.6289*1 + 1.5046*0 + 2.9790*0.64 + error = 3.54 + error
+
+loglongevity(low)= 1.2189*0 + 1.6289*0 + 1.5046*1 + 2.9790*0.64 + error = 3.41 + error
+
+### 7
+
+```{r}
+par(mfrow=c(1,1))
+plot(loglongevity~thorax,pch=unclass(activity))
+abline(lm(loglongevity~thorax,data=fruitflies[fruitflies$activity=='isolated',]))
+abline(lm(loglongevity~thorax,data=fruitflies[fruitflies$activity=='low',]))
+abline(lm(loglongevity~thorax,data=fruitflies[fruitflies$activity=='high',]))
+```
+, where the abline plots are, from up to bottom, fitting the isolated, low and high sexual activities. Thus, when considering the thorax length, the plot shows three upward linear behaviours for the three cases. Thus, they have simmilar behaviours, however the three conditions have higher abline fit values from isolated towards high sexual activities, passing through low sexual activity. This fact confirms the numerical results obtained in the previous subsection.
+
+### 8
+
+The second model, considering the thorax length, seems to be more appropriate to the context of the exercise. There are two different ways of seeing this experiment: the first, only the sexual activity is considered, which has in turn always a positive influence towards loglongevity. When the thorax length is added to the model, these three scenarios change their coefficients in the model. We believe that considering the two explanatory variables is the best decision as we remain faithful to the original dataset, whilst respecting the influential aspect of the thorax length. At last, this decision is supported by the fact that the second model showed that the two explanatory variables are significant (see subsection 5). Thus, the first analysis is by us considered inappropriate.
+
+### 9
+
+```{r}
+par(mfrow=c(1,2))
+qqnorm(residuals(fit2))
+plot(fitted(fit2),residuals(fit2))
+```
+
+The results of the first plot, which shows the QQ-plot of the residuals, present normal distribution as the plot follows a rather straight line. Regarding heteroscedasticity, when there is a completely random and equal distribution of points throughout the range of X axis, it does not exist. Visually looking at the plot on the left, we could state that there is little heteroscedasticity since the points distribution around X seem to be rather equal. We will check this statement by the Breush-Pagan test:
+
+```{r}
+lmtest::bptest(fit2)
+```
+This test gave a p-value higher than the significance level of 0.05, therefore we can not reject the null hypothesis that the variance of the residuals is constant. 
+
+### 10
+
+Now, we will make the same approach without the logarithm.
+
+```{r}
+fit3= lm(longevity~activity-1+thorax,data=fruitflies)
+summary(fit3)
+anova(fit3)
+```
+
+Now, we will check for normality and heteroscedasticity.
+
+```{r}
+lmtest::bptest(fit3)
+```
+
+This test has a p-value less that a significance level of 0.05, therefore we can reject the null hypothesis that the variance of the residuals is constant and infer that heteroscedasticity is indeed present. Finally, as heteroscedasticity is not desired, the decision of taking the logarithm was not wise.
+
+
+## EXERCISE 2
+
+```{r}
+psi_table = read.table('psi.txt',header = TRUE)
+passed = as.numeric(psi_table$passed)
+gpa = as.numeric(psi_table$gpa)
+psi = as.numeric(psi_table$psi)
+```
+
+
+### 1
+
+```{r}
+par(mfrow=c(1,2))
+boxplot(gpa~passed)
+boxplot(gpa~psi)
+```
+We can observe here that the "gpa" was considerably higher for those who passed the exam, which is expected. Now, a more interesting analysis is done, which indicates that the median in the boxplot for those who obtained the "psi" was higher. Students who obtained training with or without this method managed, nevertheless, to reach the maximum score of 4. Furthermore, within the group of students who were offered the "psi" training, it was observed the lower overall score ("gpa" around 2.1).
+
+```{r}
+par(mfrow=c(1,2))
+interaction.plot(passed,psi,gpa)
+interaction.plot(psi,passed,gpa)
+```
+
+These plots are very interesting because they show the influence of the psi methodology on the students' overall score in the assignment. For those having been under the "psi" training, the mean of "gpa" is always observed to be lower than the mean of those who have not been trained with psi. Furthermore, among those who passed the assignment, the mean of "gpa" is lower for those who have had the psi training. The same stands for those who have not passed the assignment.
+
+### 2
+
+Here we fit a logistic model for this example.
+
+```{r}
+psi_table$gpa2=gpa^2
+psiglm=glm(passed~gpa+gpa2+psi,data=psi_table,family=binomial)
+summary(psiglm)
+
+psiglm2=glm(passed~gpa+psi,data=psi_table,family=binomial)
+summary(psiglm2)
+```
+The 2 explanatory variables are inserted as numerical variables. The positive signs of the parameter estimates mean that higher values of these variables give higher probability that the psi method was applied. A very interesting observation is that, in general, for higher values of gpa", the lower is the probability that the "psi" method was applied.
+
+### 3
+
+Now we can conclude from the two previous subsections that the "psi" method does work with regards to being efficient in enabling the students to pass the exam, however their grades are not as good as those who have not been submitted the "psi" methodology, in general.
+
+### 4
+
+The probability that a student with a "gpa" equal to 3 who receives "psi" passes the assignment is given as follows:
+
+```{r}
+psiglm=glm(passed~gpa+psi,data=psi_table,family=binomial)
+gpa3passed=data.frame(psi=as.numeric(1),gpa=3)
+predict.glm(psiglm,gpa3passed,type="response")
+```
+
+And for those who have not received "psi":
+
+```{r}
+gpa3fail=data.frame(psi=as.numeric(0),gpa=3)
+predict.glm(psiglm,gpa3fail,type="response")
+```
+
+Thus, this confirms that "psi" is a good methodology to make students pass. Students with a "gpa" of 3 who received psi" are at least 6 times more likely to pass the assignment.
+
+### 5
+
+```{r}
+psiglm=glm(passed~psi,data=psi_table,family=binomial)
+
+gpa3passed=data.frame(psi=as.numeric(1))
+pass = predict.glm(psiglm,gpa3passed,type="response")
+pass
+gpa3fail=data.frame(psi=as.numeric(0))
+fail = predict.glm(psiglm,gpa3fail,type="response")
+fail
+```
+
+These final values are not dependent on "gpa" and show higher probability values for each case, in comparison to the last subsection.
+
+### 6
+
+```{r}
+x=matrix(c(3,15,8,6),2,2) 
+x
+fisher.test(x)
+```
+The Fisher test's null hypotesis that students in group p1 have the same probibility as students in p2 is 0.0265, which is lower than 0.05 and thus  rejected. The conclusion is that there is a different between the students who did recive "psi" and those who did not .
+
+### 7
+
+Although both experiments produce the same conclusion, the Fisher test experiment does not consider the "gpa" of the participants. The second approach only tests the effectivness of "psi" without considering other attributes such as "gpa", which is not necessarily wrong.
+
+### 8
+
+The advantage of using the first method is that if the data set has more than 2 rows and columns we can use the first method, while the second method needs a 2x2 grid. The first method tests the dependency between response variable and other variables, while the second only shows if there is a difference between 2 kinds of classification and is often used in small sample sizes. Finally, the second method is not used for prediction while method 1 can be used for prediction.
+
+## EXERCISE 3
+
+```{r}
+africa = read.table('africa.txt',header = TRUE)
+```
+
+### 1
+```{r}
+par(mfrow=c(2,2))
+hist(rpois(10,0.5))
+hist(rpois(10,5))
+hist(rpois(10,100))
+hist(rpois(10,1000))
+par(mfrow=c(2,2))
+hist(rpois(100,0.5))
+hist(rpois(100,5))
+hist(rpois(100,100))
+hist(rpois(100,1000))
+par(mfrow=c(2,2))
+hist(rpois(1000,0.5))
+hist(rpois(1000,5))
+hist(rpois(1000,100))
+hist(rpois(1000,1000))
+par(mfrow=c(2,2))
+hist(rpois(10000,0.5))
+hist(rpois(10000,5))
+hist(rpois(10000,100))
+hist(rpois(10000,1000))
+```
+What can be observed here is that, keeping n fixed and varying lambda, we obtain different histograms. The larger the value of lambda, the larger the values of Y on average and the larger also the spread in the values of Y. For high lambdas, the Poisson(lambda)-distributionis approximately equal to a normal distribution.
+
+Now, keeping lambda fixed and varying n, we obtain again new histograms.
+We can see that the dimension of the x-axis stays approximately the same, since the lambda is the same. However, a higher number of the population makes the distribution of the values around this same population more equal. This does not mean that the outputs of the rpois function is the same for all elements, only that it is better distributed (more normally distributed).
+
+
+### 2
+
+In Poisson regression, the parameter lambda is modeled as follows:
+
+log(lambda) = b0 + b1*x1 + b2*x2 + ... + bn*xn
+
+This model states that for each output Y, lambda is modeled in a different way. This is due to the fact that the corresponding explanatory variables x are different. Thus, for each observation, the variances are different. Finally, the residuals do not come from one fixed distribution.
+
+### 3
+
+```{r}
+attach(africa)
+miltcoup=as.numeric(africa$miltcoup)
+oligarchy=as.numeric(africa$oligarchy)
+pollib=as.numeric(africa$pollib)
+parties=as.numeric(africa$parties)
+pctvote=as.numeric(africa$pctvote)
+popn=as.numeric(africa$popn)
+size=as.numeric(africa$size)
+numelec=as.numeric(africa$numelec)
+numregim=as.numeric(africa$numregim)
+
+africa_fullmodel=glm(miltcoup~oligarchy+pollib+parties+pctvote+popn+size+numelec+numregim,family=poisson,data=africa)
+summary(africa_fullmodel)
+
+confint(africa_fullmodel)
+coef(africa_fullmodel)
+```
+
+The results of this model shows that many variables might not be appropriate for this model. This is explained by the high values on the last column in the summary of the model. For many variables, these values are a lot above 0.05. Thus, a stepwise decrease procedure would be adequate for this model.
+
+### 4
+
+Now, we must check whether the coefficients are individually equal to zero (hypothesis H0) in the stepwise decrease method. As we can see in the last subsection, the last column in the linear model report has the highest value for the variable 'numelec'. Thus, this last is deleted as it is higher than 0.05. Thus, we perform the test again without this variable.
+
+```{r}
+africa_model=glm(miltcoup~oligarchy+pollib+parties+pctvote+popn+size+numregim,family=poisson,data=africa)
+summary(africa_model)
+```
+The same now applies for the variable "numregim". The new test follows.
+```{r}
+africa_model=glm(miltcoup~oligarchy+pollib+parties+pctvote+popn+size,family=poisson,data=africa)
+summary(africa_model)
+```
+Now, eliminating the variable "size".
+```{r}
+africa_model=glm(miltcoup~oligarchy+pollib+parties+pctvote+popn,family=poisson,data=africa)
+summary(africa_model)
+```
+Eliminating "popn":
+```{r}
+africa_model=glm(miltcoup~oligarchy+pollib+parties+pctvote,family=poisson,data=africa)
+summary(africa_model)
+```
+and "pctvote":
+```{r}
+africa_model=glm(miltcoup~oligarchy+pollib+parties,family=poisson,data=africa)
+summary(africa_model)
+```
+
+Now, all the variables in the model are significant, as their coefficients are lower than 0.05. We end up with the variables "oligarchy", "pollib" and "parties" as explanatory variables for the output "miltcoup". Thus, many variables were deleted from the model.
+
+### 5
+
+```{r}
+par(mfrow=c(1,2))
+plot(fitted(africa_model),residuals(africa_model))
+plot(log(fitted(africa_model)),residuals(africa_model))
+par(mfrow=c(1,2))
+plot(log(fitted(africa_model)),residuals(africa_model,type="response"))
+
+par(mfrow=c(1,2))
+plot(fitted(africa_fullmodel),residuals(africa_fullmodel))
+plot(log(fitted(africa_fullmodel)),residuals(africa_fullmodel))
+par(mfrow=c(1,2))
+plot(log(fitted(africa_fullmodel)),residuals(africa_fullmodel,type="response"))
+```
+
+The plots do not have any specific structure, and there does not seem to exist any major changes.
