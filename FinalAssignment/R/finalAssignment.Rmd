@@ -37,14 +37,15 @@ subsetting
 
 ```{r}
 
-mydata <- mydata[which(mydata$srch_id < 1000),] 
+mydata <- mydata[which(mydata$srch_id < 2000),]
+# mydata <- head(mydata,1000)
 length((unique(mydata$srch_id)))
 median((unique(mydata$srch_id)))
 max(mydata$srch_id)
 ```
 pairs plot
 ```{r}
-df <- subset(mydata, select = -c(consumer))
+df <- subset(head(mydata,50), select = -c(consumer))
 pairs(df)
 ```
 
@@ -63,7 +64,8 @@ chisq.out.test(mydata$price_usd, variance = var(mydata$price_usd),opposite = FAL
 removing outliers
 ```{r}
 mydata <- mydata[which(mydata$price_usd < 1242 ),] 
-
+chisq.out.test(mydata$price_usd, variance = var(mydata$price_usd),opposite = TRUE)
+chisq.out.test(mydata$price_usd, variance = var(mydata$price_usd),opposite = FALSE)
 ```
 
 
@@ -84,7 +86,7 @@ hist(mydata$prop_location_score1,main="prop_location_score1")
 hist(mydata$prop_location_score2,main="prop_location_score2")
 ```
 ```{r}
-# df <- subset(mydata, select = -c(consumer,click_bool,srch_id,site_id,prop_id,))
+df <- subset(mydata, select = -c(consumer,click_bool,srch_id,site_id,prop_id))
 round(cor(df),3)
 ```
                     prop_starrating prop_review_score prop_location_score1 prop_location_score2 price_usd promotion_flag booking_bool
@@ -146,6 +148,69 @@ qqnorm(residuals(aovpen))
 plot(fitted(aovpen),residuals(aovpen))
 
 ```
+#Logistic Regression
+An experiment with:
+an outcome Y that is 0 or 1 (“binary dependent variable”);
+one or more numerical explanatory variables X1,...,Xp.
+one or more factor explanatory variables. (“independent variable”).
+The purpose is to explain Y by a function of X.
 
+```{r}
+tot=xtabs(~prop_review_score+price_usd,data=mydata); 
+hist(mydata$price_usd,main="price_usd");
+round(xtabs(booking_bool~prop_review_score+price_usd,data=mydata)/tot,2)
 
+totage=xtabs(~prop_review_score,data=mydata)
+barplot(xtabs(booking_bool~prop_review_score,data=esoph)/totage)
+
+mydata$prop_review_score2 <- mydata$prop_review_score^2
+myglm=glm(booking_bool~prop_review_score+prop_review_score2+price_usd,data=mydata,family=binomial)
+summary(myglm)
+ 
+ 
+```
+```{r}
+myglm=glm(booking_bool~
+                         prop_starrating
+          +prop_review_score
+            +prop_location_score1
+            +prop_location_score2
+            +price_usd
+            +promotion_flag
+            +consumer
+            ,data=mydata,family=binomial)
+summary(myglm)
+```
+
+```{r}
+myglm=glm(booking_bool~
+            prop_review_score
+            +prop_location_score1
+            +prop_location_score2
+            +price_usd
+            +promotion_flag
+            +consumer
+            ,data=mydata,family=binomial)
+summary(myglm)
+```
+```{r}
+mydata$consumer=factor(mydata$consumer)
+mydata$prop_review_score=factor(mydata$prop_review_score)
+mydata$prop_review_score=factor(mydata$prop_review_score)
+myglm=glm(booking_bool~
+            prop_review_score
+            +prop_location_score2
+            +price_usd
+            +promotion_flag
+            +consumer
+            ,data=mydata,family=binomial)
+summary(myglm)
+```
+```{r}
+
+plot(c(0,coef(myglm)[2:9]),type="l",main = "coefficients for prop reviews 1 to 5 with 0.5 steps" )
+```
+```{r}
+drop1(myglm,test="Chisq")
+```
 
