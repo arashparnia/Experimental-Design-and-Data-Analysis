@@ -2,6 +2,7 @@
 output:
   pdf_document: default
   html_document: default
+  word_document: default
 ---
 always_allow_html: yes
 ---
@@ -12,57 +13,93 @@ output:
   pdf_document: default
   html_document: default
 ---
+# Experimental Design and Data Analysis - How does marital status affect hotel choices.
 # how does martial status effect hotels choices
+
+## Introduction
+
 Importing data from original databse
-consumer class variable is created from the variablessrchadultscountand srchchildrencount. Consumers with asrchadultcountof 1 and 2 would be transformed to “sin-gle person” and “couples” respectively. Consumers with a srchchildrencount greater than 1 wouldbe called ”parents”. All other consumers are called ”others
+consumer class variable is created from the variablessrchadultscountand srchchildrencount. Consumers with asrchadultcountof 1 and 2 would be transformed to "sin-gle person" and "couples" respectively. Consumers with a srchchildrencount greater than 1 wouldbe called "parents". All other consumers are called "others
  
 
-loading and saving
+
+## Research question
+
+The present work aims at discovering what influences clients to book properties in the Expedia website. Many explanatory variables are present, such as the user ID, the property ID, the mean star rating of hotels, and whether the user clicked and/or booked a property, among others.
+
+### Importing data from original databse
+An initial shortening of the dataset was made necessary, since the original dataset had almost 4 million entries and 54 columns. The original database is the expedia dataset for kaggel competition which was provided in VU Data Minging class of 2017.
+
+Consumer feature was created from the combination of srch number of adults and number of children 
+single: one person :  search adult == 1 
+couple: two people (real couple or friends)  : search adult > 1
+parents: anyone traveling with children search children > 0
+other: more than 2 people in the room and no children : search adult > 2 & search shildren == 0
+
+The original data set had a large amount of missing values which were excluded or replaced before importing the data to R.
+
+
+###loading and saving
+due to the large dataset the original data set was saved in a RData object for faster loading and access
 ```{r}
-
-
-
-
 load(file = "../Data/mydata.RData")
 # save(mydata,file = "../Data/mydata.RData")
 mydata <- data
 remove(data)
 ```
 
-trim database
+### Trim database
+uneccesery features were removed to make graphs more meaningful
 ```{r}
-# mydata <- subset(mydata, select = -c(prop_brand_bool) )
-# mydata <- subset(mydata, select = -c(position) )
-# mydata <- subset(mydata, select = -c(srch_saturday_night_bool) )
-# mydata <- subset(mydata, select = -c(random_bool) )
-# mydata <- subset(mydata, select = -c(price_usd_normalized) )
-# mydata <- subset(mydata, select = -c(Pclass) )
-# mydata <- subset(mydata, select = -c(score) )
-
+# mydata <- subset(mydata, select = -c(prop_brand_bool,position,srch_saturday_night_bool,random_bool,price_usd_normalized,Pclass,score,site_id))
+length(((mydata$srch_id)))
+length((unique(mydata$srch_id)))
 ```
-
-subsetting
+Data set contains 221879 search ids and 199795 uniqe search ids
+srch_id coresponds to a user searching search session
+### Subsetting
+The data set is still too large for the purposes of this research, therefore only properties were the user showed interet by clicking are subset and prop_review_score of 0 which means the property has no ranking are also removed. 
+To create a smaller sample size only the first 4000 srch_id are selected.
 ```{r}
 mydata <- mydata[which(mydata$click_bool ==  1),]
+mydata <- subset(mydata, select = -c(click_bool))
 mydata <- mydata[which(mydata$prop_review_score !=  0),]
 mydata <- mydata[which(mydata$srch_id < 4000),]
 # mydata <- head(mydata,1000)
 length(((mydata$srch_id)))
 length((unique(mydata$srch_id)))
+summary(mydata)
 ```
-how many uniqe search ids
+The data set now has 2611 search ids in which 2360 are uniqe.
+Prop_starrating ranges from 1 to 5  with step of 0.5 representing the star rating of the property.
+Prop_review_score ranges from 1 to 5 representing the user's review score of the property.
+Prop_location_score1 and prop_location_score2 are the internal location scoring of the property from Expedia.
+Price_usd coresponds to the price of the property.
+Promotion_flag is a binary 0 or 1 value on whether the property was promoted or not.
+Booking_bool is also a binary 0 or 1 determining if the user has booked the property.
+Consumer is a catagorical variable with classes Single, Couple, Parents and Other.
+
 
 pairs plot
 ```{r}
-df <- subset(head(mydata,50), select = -c(consumer))
+df <- subset(head(mydata,200), select = -c(consumer))
+# df <- subset(head(mydata,100), select = c(price_usd,prop_starrating,prop_review_score))
 pairs(df)
+# library(plotly)
+# library(ggplot2)
+# pm <- GGally::ggpairs(df)
+# p <- ggplotly(pm)
+# tmpFile <- tempfile(fileext = ".png")
+# export(p, file = tmpFile)
+
 ```
 
 ```{r}
-qqnorm(mydata$price_usd)
 shapiro.test(mydata$price_usd)
+# quickplot(sample = price_usd, data = mydata, color=consumer)
+
 ```
-not normally disterbuted 
+disterbution test for price is proven to be not normally disterbuted 
 
 ```{r}
 library(outliers)
@@ -78,13 +115,21 @@ chisq.out.test(mydata$price_usd, variance = var(mydata$price_usd),opposite = FAL
 ```
 
 ```{r}
-# library(plotly)
+library(plotly)
 # library(ggplot2)
-# plot_ly(x = mydata$price_usd, type = "histogram")
+p <- plot_ly(x = mydata$price_usd, type = "histogram")
 # ggplotly(p)
 # ggplotly(p)
 
+
+tmpFile <- tempfile(fileext = ".png")
+export(p, file = tmpFile)
+
 ```
+<!-- ![Caption for the picture.](`r tmpFile`) -->
+
+
+
 
 ```{r}
 
@@ -107,9 +152,18 @@ hist(mydata$prop_location_score2,main="prop_location_score2")
 
 ```
 
-```{r}
-df <- subset(mydata, select = -c(consumer,click_bool,srch_id,site_id,prop_id))
-round(cor(df),3)
+```{r, message = F, warning=F}
+
+
+options(warn=-1)
+df <- subset(mydata, select = -c(consumer,srch_id,booking_bool))
+# round(cor(df),3)
+library(Hmisc)
+res<-rcorr(as.matrix(df))
+signif(res$r, 2)
+signif(res$P,2)
+library(PerformanceAnalytics)
+chart.Correlation(df, histogram=TRUE, pch=19)
 ```
                     prop_starrating prop_review_score prop_location_score1 prop_location_score2 price_usd promotion_flag booking_bool
 prop_starrating                 1.00              0.31                 0.30                 0.05      0.47           0.19         0.00
