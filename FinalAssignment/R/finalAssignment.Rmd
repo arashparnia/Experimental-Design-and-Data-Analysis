@@ -1,14 +1,22 @@
 ---
-title: "Final Assignment"
-output: html_notebook
+output:
+  pdf_document: default
+  html_document: default
 ---
-
+always_allow_html: yes
+---
+title: "Final Assignment"
+output:
+  word_document: default
+  html_notebook: default
+  pdf_document: default
+  html_document: default
+---
+# how does martial status effect hotels choices
 Importing data from original databse
-```{r}
-length(which(mydata$click_bool == 1))
-mydata <- mydata[which(mydata$click_bool == 1),]
-length(mydata)
-```
+consumer class variable is created from the variablessrchadultscountand srchchildrencount. Consumers with asrchadultcountof 1 and 2 would be transformed to “sin-gle person” and “couples” respectively. Consumers with a srchchildrencount greater than 1 wouldbe called ”parents”. All other consumers are called ”others
+ 
+
 loading and saving
 ```{r}
 
@@ -23,26 +31,27 @@ remove(data)
 
 trim database
 ```{r}
-mydata <- subset(mydata, select = -c(prop_brand_bool) )
-mydata <- subset(mydata, select = -c(position) )
-mydata <- subset(mydata, select = -c(srch_saturday_night_bool) )
-mydata <- subset(mydata, select = -c(random_bool) )
-mydata <- subset(mydata, select = -c(price_usd_normalized) )
-mydata <- subset(mydata, select = -c(Pclass) )
-mydata <- subset(mydata, select = -c(score) )
+# mydata <- subset(mydata, select = -c(prop_brand_bool) )
+# mydata <- subset(mydata, select = -c(position) )
+# mydata <- subset(mydata, select = -c(srch_saturday_night_bool) )
+# mydata <- subset(mydata, select = -c(random_bool) )
+# mydata <- subset(mydata, select = -c(price_usd_normalized) )
+# mydata <- subset(mydata, select = -c(Pclass) )
+# mydata <- subset(mydata, select = -c(score) )
 
 ```
 
 subsetting
-
 ```{r}
-
-mydata <- mydata[which(mydata$srch_id < 2000),]
+mydata <- mydata[which(mydata$click_bool ==  1),]
+mydata <- mydata[which(mydata$prop_review_score !=  0),]
+mydata <- mydata[which(mydata$srch_id < 4000),]
 # mydata <- head(mydata,1000)
+length(((mydata$srch_id)))
 length((unique(mydata$srch_id)))
-median((unique(mydata$srch_id)))
-max(mydata$srch_id)
 ```
+how many uniqe search ids
+
 pairs plot
 ```{r}
 df <- subset(head(mydata,50), select = -c(consumer))
@@ -68,8 +77,17 @@ chisq.out.test(mydata$price_usd, variance = var(mydata$price_usd),opposite = TRU
 chisq.out.test(mydata$price_usd, variance = var(mydata$price_usd),opposite = FALSE)
 ```
 
+```{r}
+# library(plotly)
+# library(ggplot2)
+# plot_ly(x = mydata$price_usd, type = "histogram")
+# ggplotly(p)
+# ggplotly(p)
+
+```
 
 ```{r}
+
 par(mfrow=c(3,2));
 qqnorm(mydata$price_usd,main="price_usd")
 qqnorm(mydata$prop_starrating,main="prop_starrating")
@@ -85,6 +103,10 @@ hist(mydata$prop_review_score,main="prop_review_score")
 hist(mydata$prop_location_score1,main="prop_location_score1")
 hist(mydata$prop_location_score2,main="prop_location_score2")
 ```
+```{r}
+
+```
+
 ```{r}
 df <- subset(mydata, select = -c(consumer,click_bool,srch_id,site_id,prop_id))
 round(cor(df),3)
@@ -112,25 +134,21 @@ xtabs(price_usd ~ prop_starrating + prop_review_score ,data=mydata)
 
 ```{r}
 attach(mydata)
-par(mfrow=c(3,3))
+# par(mfrow=c(3,3))
 boxplot(price_usd~prop_starrating); boxplot(price_usd~consumer) ; boxplot(price_usd~prop_review_score) 
 
 interaction.plot(prop_starrating,consumer,price_usd); interaction.plot(consumer,prop_starrating,price_usd) ; interaction.plot(prop_review_score,prop_starrating,price_usd) 
 ```
-```{r}
-aovpen=lm(price_usd~prop_starrating+consumer,data=mydata)
 
-anova(aovpen)
-summary(aovpen)
-qqnorm(residuals(aovpen))
-plot(fitted(aovpen),residuals(aovpen))
-
-```
 ```{r}
+mydata$prop_starrating=factor(mydata$prop_starrating)
+mydata$prop_review_score=factor(mydata$prop_review_score)
+
 aovpen=lm(price_usd~prop_starrating+prop_review_score,data=mydata)
 
 anova(aovpen)
 summary(aovpen)
+drop1(aovpen,test="Chisq")
 qqnorm(residuals(aovpen))
 plot(fitted(aovpen),residuals(aovpen))
 
@@ -138,16 +156,7 @@ plot(fitted(aovpen),residuals(aovpen))
 
 prop_starrating is more significant than consumer type and prop_review_score but also both significant 
 
-```{r}
 
-aovpen=lm(price_usd~prop_review_score + consumer,data=mydata)
-
-anova(aovpen)
-summary(aovpen)
-qqnorm(residuals(aovpen))
-plot(fitted(aovpen),residuals(aovpen))
-
-```
 #Logistic Regression
 An experiment with:
 an outcome Y that is 0 or 1 (“binary dependent variable”);
@@ -156,16 +165,16 @@ one or more factor explanatory variables. (“independent variable”).
 The purpose is to explain Y by a function of X.
 
 ```{r}
-tot=xtabs(~prop_review_score+price_usd,data=mydata); 
-hist(mydata$price_usd,main="price_usd");
-round(xtabs(booking_bool~prop_review_score+price_usd,data=mydata)/tot,2)
-
-totage=xtabs(~prop_review_score,data=mydata)
-barplot(xtabs(booking_bool~prop_review_score,data=esoph)/totage)
-
-mydata$prop_review_score2 <- mydata$prop_review_score^2
-myglm=glm(booking_bool~prop_review_score+prop_review_score2+price_usd,data=mydata,family=binomial)
-summary(myglm)
+# tot=xtabs(~prop_review_score+price_usd,data=mydata); 
+# hist(mydata$price_usd,main="price_usd");
+# round(xtabs(booking_bool~prop_review_score+price_usd,data=mydata)/tot,2)
+# 
+# totage=xtabs(~prop_review_score,data=mydata)
+# barplot(xtabs(booking_bool~prop_review_score,data=mydata)/totage)
+# 
+# mydata$prop_review_score2 <- mydata$prop_review_score^2
+# myglm=glm(booking_bool~prop_review_score+prop_review_score2+price_usd,data=mydata,family=binomial)
+# summary(myglm)
  
  
 ```
@@ -197,7 +206,6 @@ drop1(myglm,test="Chisq")
 ```
 ```{r}
 mydata$consumer=factor(mydata$consumer)
-mydata$prop_review_score=factor(mydata$prop_review_score)
 mydata$prop_review_score=factor(mydata$prop_review_score)
 myglm=glm(booking_bool~
             prop_review_score
