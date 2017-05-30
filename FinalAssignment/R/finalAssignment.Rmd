@@ -180,6 +180,7 @@ myglm=glm(booking_bool~
             +consumer
             ,data=mydata,family=binomial)
 summary(myglm)
+drop1(myglm,test="Chisq")
 ```
 
 ```{r}
@@ -192,6 +193,7 @@ myglm=glm(booking_bool~
             +consumer
             ,data=mydata,family=binomial)
 summary(myglm)
+drop1(myglm,test="Chisq")
 ```
 ```{r}
 mydata$consumer=factor(mydata$consumer)
@@ -205,6 +207,7 @@ myglm=glm(booking_bool~
             +consumer
             ,data=mydata,family=binomial)
 summary(myglm)
+drop1(myglm,test="Chisq")
 ```
 ```{r}
 
