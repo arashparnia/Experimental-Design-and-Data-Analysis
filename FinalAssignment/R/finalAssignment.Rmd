@@ -13,7 +13,7 @@ output:
   pdf_document: default
   html_document: default
 ---
-# Experimental Design and Data Analysis - How does marital status affect hotel choices.
+# Experimental Design and Data Analysis - .
 # how does martial status effect hotels choices
 
 ## Introduction
@@ -21,15 +21,17 @@ output:
 Importing data from original databse
 consumer class variable is created from the variablessrchadultscountand srchchildrencount. Consumers with asrchadultcountof 1 and 2 would be transformed to "sin-gle person" and "couples" respectively. Consumers with a srchchildrencount greater than 1 wouldbe called "parents". All other consumers are called "others
  
-
-
 ## Research question
+* How does marital status affect hotel choices?
+  - This is research question will explore what makes the user book a hotel and if different status of the user effects this choice.
+* What effets the price of a hotel?
+  - This research question is looking to explore all possible features, and which of these features are significant 
 
-The present work aims at discovering what influences clients to book properties in the Expedia website. Many explanatory variables are present, such as the user ID, the property ID, the mean star rating of hotels, and whether the user clicked and/or booked a property, among others.
+The present work aims at discovering what influences clients to book properties in the Expedia website. Many explanatory variables are present, such as the star rating of hotels, their review score,  the quality of the location of the hotel and if they were promoted and whether the user booked a property, and their price.
 
 ### Importing data from original databse
-An initial shortening of the dataset was made necessary, since the original dataset had almost 4 million entries and 54 columns. The original database is the expedia dataset for kaggel competition which was provided in VU Data Minging class of 2017.
-
+An initial shortening of the dataset was made necessary, since the original dataset had almost 4 million entries and 54 columns. The original database is the expedia dataset for kaggel competition which was provided in VU Data Minging class of 2017. Many of the comuns were comparision of the property with other websites, which were omited initially.
+A new feature was added from combination of two other features to create a catagorical varible with will be used in the reasearch question.
 Consumer feature was created from the combination of srch number of adults and number of children 
 single: one person :  search adult == 1 
 couple: two people (real couple or friends)  : search adult > 1
@@ -38,10 +40,9 @@ other: more than 2 people in the room and no children : search adult > 2 & searc
 
 The original data set had a large amount of missing values which were excluded or replaced before importing the data to R.
 
-
 ###loading and saving
 due to the large dataset the original data set was saved in a RData object for faster loading and access
-```{r}
+```{r tidy=TRUE ,comment = ""}
 load(file = "../Data/mydata.RData")
 # save(mydata,file = "../Data/mydata.RData")
 mydata <- data
@@ -50,27 +51,25 @@ remove(data)
 
 ### Trim database
 uneccesery features were removed to make graphs more meaningful
-```{r}
+```{r tidy=TRUE, comment = ""}
 # mydata <- subset(mydata, select = -c(prop_brand_bool,position,srch_saturday_night_bool,random_bool,price_usd_normalized,Pclass,score,site_id))
-length(((mydata$srch_id)))
-length((unique(mydata$srch_id)))
+cat('Data set contains ',length(((mydata$srch_id))) , 'search ids and ', length((unique(mydata$srch_id))) , 'uniqe search ids' )
 ```
-Data set contains 221879 search ids and 199795 uniqe search ids
 srch_id coresponds to a user searching search session
+
 ### Subsetting
 The data set is still too large for the purposes of this research, therefore only properties were the user showed interet by clicking are subset and prop_review_score of 0 which means the property has no ranking are also removed. 
 To create a smaller sample size only the first 4000 srch_id are selected.
-```{r}
+```{r tidy=TRUE ,comment = ""}
 mydata <- mydata[which(mydata$click_bool ==  1),]
 mydata <- subset(mydata, select = -c(click_bool))
 mydata <- mydata[which(mydata$prop_review_score !=  0),]
 mydata <- mydata[which(mydata$srch_id < 4000),]
 # mydata <- head(mydata,1000)
-length(((mydata$srch_id)))
-length((unique(mydata$srch_id)))
 summary(mydata)
 ```
 The data set now has 2611 search ids in which 2360 are uniqe.
+The subsetting data was done using search id to have a ocnsistant and real user inputs rather ran sampeling random data which might not nesseserily represent the user's prefrences.
 Prop_starrating ranges from 1 to 5  with step of 0.5 representing the star rating of the property.
 Prop_review_score ranges from 1 to 5 representing the user's review score of the property.
 Prop_location_score1 and prop_location_score2 are the internal location scoring of the property from Expedia.
@@ -81,82 +80,60 @@ Consumer is a catagorical variable with classes Single, Couple, Parents and Othe
 
 
 pairs plot
-```{r}
-df <- subset(head(mydata,200), select = -c(consumer))
-# df <- subset(head(mydata,100), select = c(price_usd,prop_starrating,prop_review_score))
-pairs(df)
-# library(plotly)
-# library(ggplot2)
-# pm <- GGally::ggpairs(df)
-# p <- ggplotly(pm)
-# tmpFile <- tempfile(fileext = ".png")
-# export(p, file = tmpFile)
-
+```{r ,warning = FALSE,  tidy=TRUE, comment = ""}
+df <- subset(head(mydata,1000), select = c(price_usd,prop_starrating,prop_review_score,promotion_flag,consumer,booking_bool))
+library(GGally)
+ggpairs(df, diag=list(continuous="density", discrete="bar"), axisLabels="show")
 ```
-
-```{r}
-shapiro.test(mydata$price_usd)
+The pairs plot shows the disterbution of all selected features as well as their relationship with one another.
+We furthure investigate this relationsips.
+```{r tidy=TRUE ,comment = ""}
+par(mfrow=c(3,3));
 # quickplot(sample = price_usd, data = mydata, color=consumer)
+qqnorm(mydata$price_usd,main="price_usd") ;qqline(mydata$price_usd);
+qqnorm(mydata$prop_starrating,main="prop_starrating") ;qqline(mydata$prop_starrating);
+qqnorm(mydata$prop_review_score,main="prop_review_score") ;qqline(mydata$prop_review_score);
+qqnorm(mydata$prop_location_score1,main="prop_location_score1") ;qqline(mydata$prop_location_score1);
+qqnorm(mydata$prop_location_score2,main="prop_location_score2") ;qqline(mydata$prop_location_score2);
+qqnorm(mydata$booking_bool,main="booking_bool") ;qqline(mydata$booking_bool);
 
 ```
-disterbution test for price is proven to be not normally disterbuted 
+disterbution test for price, star rating, review score and location score 2  are proven to be not normally disterbuted. booking boolean seems to need a logistic fit and the only normaly disterbuted feature seems to be location score 1.
 
-```{r}
+### An investigation for outliers is done using the R package outliers and chisq.out.test
+```{r tidy=TRUE, comment = ""}
 library(outliers)
 chisq.out.test(mydata$price_usd, variance = var(mydata$price_usd),opposite = TRUE)
 chisq.out.test(mydata$price_usd, variance = var(mydata$price_usd),opposite = FALSE)
 ```
-
-removing outliers
-```{r}
+The result shows an outliar on the highest values which will be removed but acording to the norm plot and the p value the lower value outlier can remain.
+removing outliers and testing them again.
+```{r tidy=TRUE ,comment = ""}
 mydata <- mydata[which(mydata$price_usd < 1242 ),] 
 chisq.out.test(mydata$price_usd, variance = var(mydata$price_usd),opposite = TRUE)
 chisq.out.test(mydata$price_usd, variance = var(mydata$price_usd),opposite = FALSE)
 ```
 
-```{r}
+```{r, message = F, warning=F, tidy=TRUE, comment = ""}
 library(plotly)
-# library(ggplot2)
-p <- plot_ly(x = mydata$price_usd, type = "histogram")
-# ggplotly(p)
-# ggplotly(p)
 
+# # ggplotly(p)
+# hist(mydata$price_usd,main="price_usd")
+# hist(mydata$prop_starrating,main="prop_starrating")
+# hist(mydata$prop_review_score,main="prop_review_score")
+# hist(mydata$prop_location_score1,main="prop_location_score1")
+# hist(mydata$prop_location_score2,main="prop_location_score2")
 
-tmpFile <- tempfile(fileext = ".png")
-export(p, file = tmpFile)
-
-```
-<!-- ![Caption for the picture.](`r tmpFile`) -->
-
-
-
-
-```{r}
-
-par(mfrow=c(3,2));
-qqnorm(mydata$price_usd,main="price_usd")
-qqnorm(mydata$prop_starrating,main="prop_starrating")
-qqnorm(mydata$prop_review_score,main="prop_review_score")
-qqnorm(mydata$prop_location_score1,main="prop_location_score1")
-qqnorm(mydata$prop_location_score2,main="prop_location_score2")
-```
-```{r}
-par(mfrow=c(3,2));
-hist(mydata$price_usd,main="price_usd")
-hist(mydata$prop_starrating,main="prop_starrating")
-hist(mydata$prop_review_score,main="prop_review_score")
-hist(mydata$prop_location_score1,main="prop_location_score1")
-hist(mydata$prop_location_score2,main="prop_location_score2")
-```
-```{r}
+# tmpFile <- tempfile(fileext = ".png")
+# export(p, file = tmpFile)
 
 ```
 
-```{r, message = F, warning=F}
+## Investigating corelation between features
 
-
+```{r, message = F, warning=F, tidy=TRUE, comment = ""}
 options(warn=-1)
-df <- subset(mydata, select = -c(consumer,srch_id,booking_bool))
+df <- subset(mydata, select = -c(consumer,srch_id,booking_bool,site_id,prop_id,promotion_flag))
 # round(cor(df),3)
 library(Hmisc)
 res<-rcorr(as.matrix(df))
@@ -165,36 +142,25 @@ signif(res$P,2)
 library(PerformanceAnalytics)
 chart.Correlation(df, histogram=TRUE, pch=19)
 ```
-                    prop_starrating prop_review_score prop_location_score1 prop_location_score2 price_usd promotion_flag booking_bool
-prop_starrating                 1.00              0.31                 0.30                 0.05      0.47           0.19         0.00
-prop_review_score               0.31              1.00                 0.15                 0.04      0.22           0.06         0.12
-prop_location_score1            0.30              0.15                 1.00                 0.29      0.27           0.16         0.00
-prop_location_score2            0.05              0.04                 0.29                 1.00      0.02           0.03         0.11
-price_usd                       0.47              0.22                 0.27                 0.02      1.00          -0.01        -0.11
-promotion_flag                  0.19              0.06                 0.16                 0.03     -0.01           1.00         0.11
-booking_bool                    0.00              0.12                 0.00                 0.11     -0.11           0.11         1.00
 
-with 0.47 prop_starrating  has the highest colinearity with price_usd followed by  0.31 for prop_starrating and prop_review_score 
+with prop_starrating  has the highest colinearity with price_usd followed by prop_starrating and prop_review_score 
 
 
-```{r}
+###randomized block design
+To investigate the relationship between different features that effect price we use randomized block design techniqe. Property star rating will be  the treatment factor with fixed levels from 1 to 5 and the block factor will be  prop_review_score which can also be fixed at levels 1 to 5.
 
-```
-randomized block design
-```{r}
-xtabs(price_usd ~ prop_starrating + consumer ,data=mydata)
+```{r, message = F, warning=F, tidy=TRUE, comment = ""}
 xtabs(price_usd ~ prop_starrating + prop_review_score ,data=mydata)
 ```
-
-```{r}
+Clearly as property start rating and review increase the price increases.
+```{r, message = F, warning=F, tidy=TRUE, comment = ""}
 attach(mydata)
-# par(mfrow=c(3,3))
-boxplot(price_usd~prop_starrating); boxplot(price_usd~consumer) ; boxplot(price_usd~prop_review_score) 
-
-interaction.plot(prop_starrating,consumer,price_usd); interaction.plot(consumer,prop_starrating,price_usd) ; interaction.plot(prop_review_score,prop_starrating,price_usd) 
+par(mfrow=c(2,2))
+boxplot(price_usd~prop_starrating); boxplot(price_usd~prop_review_score); 
+interaction.plot( prop_review_score , prop_starrating,price_usd ); interaction.plot( prop_starrating , prop_review_score ,price_usd ); 
 ```
 
-```{r}
+```{r, message = F, warning=F, tidy=TRUE, comment = ""}
 mydata$prop_starrating=factor(mydata$prop_starrating)
 mydata$prop_review_score=factor(mydata$prop_review_score)
 
@@ -218,7 +184,7 @@ one or more numerical explanatory variables X1,...,Xp.
 one or more factor explanatory variables. (“independent variable”).
 The purpose is to explain Y by a function of X.
 
-```{r}
+```{r, message = F, warning=F, tidy=TRUE, comment = ""}
 # tot=xtabs(~prop_review_score+price_usd,data=mydata); 
 # hist(mydata$price_usd,main="price_usd");
 # round(xtabs(booking_bool~prop_review_score+price_usd,data=mydata)/tot,2)
@@ -232,7 +198,7 @@ The purpose is to explain Y by a function of X.
  
  
 ```
-```{r}
+```{r, message = F, warning=F, tidy=TRUE, comment = ""}
 myglm=glm(booking_bool~
                          prop_starrating
           +prop_review_score
@@ -246,7 +212,7 @@ summary(myglm)
 drop1(myglm,test="Chisq")
 ```
 
-```{r}
+```{r, message = F, warning=F, tidy=TRUE, comment = ""}
 myglm=glm(booking_bool~
             prop_review_score
             +prop_location_score1
@@ -271,11 +237,11 @@ myglm=glm(booking_bool~
 summary(myglm)
 drop1(myglm,test="Chisq")
 ```
-```{r}
+```{r, message = F, warning=F, tidy=TRUE, comment = ""}
 
 plot(c(0,coef(myglm)[2:9]),type="l",main = "coefficients for prop reviews 1 to 5 with 0.5 steps" )
 ```
-```{r}
+```{r, message = F, warning=F, tidy=TRUE, comment = ""}
 drop1(myglm,test="Chisq")
 ```
 
