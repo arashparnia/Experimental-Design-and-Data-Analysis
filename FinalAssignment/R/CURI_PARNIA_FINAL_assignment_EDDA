@@ -1,0 +1,238 @@
+---
+title: "Experimental Design and Data Analysis - What influences hotel bookings ?"
+output:
+  pdf_document: default
+  html_notebook: default
+---
+
+## Introduction
+
+The present work is part of the final assignment of the course in Experimental Design and Data Analysis of the Vrije Universiteit Amsterdam. A research question on the topic of booking hotel properties is done, and a few considerations are made in a preliminary step. The data is then preprocessed and a few tests are run in order to better understand the remaining dataset.
+
+## Research question
+
+The main research question is to understand what influences hotel booking prices, as well as how the different client profiles influence choices of certain properties. The original dataset was taken from the Expedia Kaggle Competition [1]. Thus, the research question is divided into the following:
+
+* What affects the price of a hotel? This research question will explore all possible features, and which of these features are significant.
+* How does marital status affect hotel choices? This is research question that will explore what makes the user book a hotel and if different status of the user effects this choice.
+
+Many explanatory variables are present, such as the user ID, the property ID, the mean star rating of hotels, and whether the user clicked and/or booked a property, among others. An initial shortening of the dataset was made necessary, since the original dataset had almost 4 million entries. Different client profiles are present, such as: single (one person); couple (two people, in general); parents (anyone traveling with children); and others (more than two people looking for a room, without children). As it was mentioned, the original dataset was imported from the original competition. The consumer-class variable was created through the manipulation of the original variables "variablessrchadultscountand" and "srchchildrencount". The profiles with "asrchadultcountof" values 1 and 2 would be transformed into "single" and "couples" respectively. Consumers with a "srchchildrencount" greater than 1 would be called "parents". All other consumers are called "others". The original data set had a large amount of missing values which were excluded or replaced before importing the data to R.
+
+## Preliminary treatment
+
+Due to the large dataset, the original data set was saved into a RData object for faster loading and access. This data is then uploaded and a considerable data reduction is done. Variables such as "prop_brand_bool", "position", "srch_saturday_night_bool", "random_bool", "price_usd_normalized", "Pclass", "score" and "site_id" are removed from the original dataset. The remaining dataset contains the following attributes:
+
+```{r}
+rm(list = ls())
+load("C:/Users/Fabio Curi/Desktop/mydata.RData")
+names(data)
+```
+
+We decided that a very interesting approach would be only considering the websites on which the users clicked (thus, neglecting click_bool = 0). Furthermore, properties with no review scores (review_score = 0) are also neglected. Then, the only 4000 users are considered, which reduces the original dataset from 221879 to 2611 rows.
+
+```{r}
+mydata <- data[which(data$click_bool ==  1),]
+mydata <- mydata[which(mydata$prop_review_score !=  0),]
+mydata <- mydata[which(mydata$srch_id < 4000),]
+mydata <- subset(mydata, select = -c(click_bool))
+remove(data)
+summary(mydata)
+```
+
+Then, we try to identify how many unique search IDs are present. These values correspond to a specific user searching a hotel property.
+
+```{r}
+cat('The data set contains',length(((mydata$srch_id))) , 'search IDs and', length((unique(mydata$srch_id))) , 'unique search IDs.' )
+```
+
+The subsetting data was done making search IDs to have a consistant and real user inputs rather than sampeling random data which might not necessarily represent the user's preferences.
+
+* prop_starrating ranges from 1 to 5  with step of 0.5, representing the star rating of the property;
+* prop_review_score ranges from 1 to 5 representing the user's review score of the property;
+* prop_location_score1 and prop_location_score2 are the internal location scoring of the property from Expedia;
+* price_usd corresponds to the price of the property;
+* promotion_flag is a binary 0 or 1 value on whether the property was promoted or not;
+* booking_bool is also a binary 0 or 1 value determining if the user has booked the property;
+* consumer is a categorical variable with the classes "single", "couple", "parents" and "others".
+
+## Data exploitation
+
+A personalized pairs-plot is done for the visualization of correlation effects.
+
+```{r ,warning = FALSE,  tidy=TRUE, comment = ""}
+library(GGally)
+df <- subset(head(mydata,1000), select = c(price_usd,prop_starrating,prop_review_score,promotion_flag,consumer,booking_bool))
+ggpairs(df, diag=list(continuous="density", discrete="bar"), axisLabels="show")
+```
+
+The pairs-plots show the distribution of all selected features, as well as their relationship with one another. We investigate these variables further.
+
+```{r tidy=TRUE ,comment = ""}
+par(mfrow=c(3,3));
+qqnorm(mydata$price_usd,main="Property price") ;qqline(mydata$price_usd);
+qqnorm(mydata$prop_starrating,main="Property star rating") ;qqline(mydata$prop_starrating);
+qqnorm(mydata$prop_review_score,main="Property review score") ;qqline(mydata$prop_review_score);
+qqnorm(mydata$prop_location_score1,main="Property location score 1") ;qqline(mydata$prop_location_score1);
+qqnorm(mydata$prop_location_score2,main="Property location score 2") ;qqline(mydata$prop_location_score2);
+qqnorm(mydata$booking_bool,main="Bookings (boolean)") ;qqline(mydata$booking_bool);
+```
+
+The distributions for "price_usd", "prop_starrating", "prop_review_score" and "prop_location_score2" are easily proven not to be normally distributed. The "booking_bool" seems to need a logistic fit; the only normally distributed feature seems to be "prop_location_score1", as it is the only one which seems to follow a rather upward straight line.
+
+### Outliers detection
+
+An investigation for outliers is done using the R package "outliers" and "chisq.out.test".
+
+```{r tidy=TRUE, comment = ""}
+library(outliers)
+chisq.out.test(mydata$price_usd, variance = var(mydata$price_usd),opposite = TRUE)
+chisq.out.test(mydata$price_usd, variance = var(mydata$price_usd),opposite = FALSE)
+```
+
+The results show an outlier within the highest values which will be removed; however, the p-value for the lowest value is significant, thus the value of 12.8 will not be removed. We will then remove the highest outlier and proceed.
+
+### Outliers removal
+
+The value 1242 will be removed from "price_usd":
+
+```{r}
+mydata <- mydata[which(mydata$price_usd < 1242 ),] 
+chisq.out.test(mydata$price_usd, variance = var(mydata$price_usd),opposite = TRUE)
+chisq.out.test(mydata$price_usd, variance = var(mydata$price_usd),opposite = FALSE)
+```
+
+So as not to render this task exhaustive, we will continue from now on having removed only the first upper outlier. Next, histograms of the most important features are presented.
+
+```{r}
+par(mfrow=c(3,2));
+
+h <- hist(mydata$price_usd,main="Property price", col="red", xlab="Dolars")
+xfit<-seq(min(mydata$price_usd),max(mydata$price_usd),length=40) 
+yfit<-dnorm(xfit,mean=mean(mydata$price_usd),sd=sd(mydata$price_usd)) 
+yfit <- yfit*diff(h$mids[1:2])*length(mydata$price_usd) 
+lines(xfit, yfit, col="blue", lwd=2)
+h <- hist(mydata$prop_starrating,main="Property star rating", col="red", xlab="Rating")
+xfit<-seq(min(mydata$prop_starrating),max(mydata$prop_starrating),length=40) 
+yfit<-dnorm(xfit,mean=mean(mydata$prop_starrating),sd=sd(mydata$prop_starrating)) 
+yfit <- yfit*diff(h$mids[1:2])*length(mydata$prop_starrating) 
+lines(xfit, yfit, col="blue", lwd=2)
+h <- hist(mydata$prop_review_score,main="Property review score", col="red", xlab="Score")
+xfit<-seq(min(mydata$prop_review_score),max(mydata$prop_review_score),length=40) 
+yfit<-dnorm(xfit,mean=mean(mydata$prop_review_score),sd=sd(mydata$prop_review_score)) 
+yfit <- yfit*diff(h$mids[1:2])*length(mydata$prop_review_score) 
+lines(xfit, yfit, col="blue", lwd=2)
+h <- hist(mydata$prop_location_score1,main="Property location score 1", col="red", xlab="Score")
+xfit<-seq(min(mydata$prop_location_score1),max(mydata$prop_location_score1),length=40) 
+yfit<-dnorm(xfit,mean=mean(mydata$prop_location_score1),sd=sd(mydata$prop_location_score1)) 
+yfit <- yfit*diff(h$mids[1:2])*length(mydata$prop_location_score1) 
+lines(xfit, yfit, col="blue", lwd=2)
+h <- hist(mydata$prop_location_score2,main="Property location score 2", col="red", xlab="Score")
+xfit<-seq(min(mydata$prop_location_score2),max(mydata$prop_location_score2),length=40) 
+yfit<-dnorm(xfit,mean=mean(mydata$prop_location_score2),sd=sd(mydata$prop_location_score2)) 
+yfit <- yfit*diff(h$mids[1:2])*length(mydata$prop_location_score2) 
+lines(xfit, yfit, col="blue", lwd=2)
+```
+ 
+The histograms show, for instance, that the two internal location scorings of the properties from Expedia have different distributions. "prop_location_score1" seems to follow a rather normal distribution, while the second one not. Furthermore, properties with higher review scores happen more often. This makes sense, as only the clicked properties are shown, thus the frequency of booked properties happen rather often and the likelihood of satisfaction is generally bigger. 
+
+### Investigating correlation between features
+
+Now, we will study the existence of colearinity and correlation between the different features.
+
+```{r, message = F, warning=F, tidy=TRUE, comment = ""}
+library(Hmisc)
+library(PerformanceAnalytics)
+options(warn=-1)
+df <- subset(mydata, select = -c(consumer,srch_id,booking_bool,site_id,prop_id,promotion_flag))
+# round(cor(df),3)
+res<-rcorr(as.matrix(df))
+signif(res$r, 2)
+signif(res$P,2)
+chart.Correlation(df, histogram=TRUE, pch=19)
+```
+
+The results show that "prop_starrating" has the highest colinearity with "price_usd", followed by "prop_starrating" and "prop_review_score". This was expected, as the higher the stars in a hotel, the higher the prices are and the higher is the likelihood of satisfaction, since the services are oftentimes performed with higher quality.
+
+### Randomized Block Design
+
+To investigate the relationship between different features that effect price, we used the randomized block design technique. "prop_starrating" will be the treatment factor with fixed levels from 1 to 5 and the block factor will be  "prop_review_score", which can also be fixed at levels from 1 to 5.
+
+```{r, message = F, warning=F, tidy=TRUE, comment = ""}
+xtabs(price_usd ~ prop_starrating + prop_review_score ,data=mydata)
+```
+
+The table confirms that, when the property star rating and review score increases, the average price also increases. Now, we are interested in finding out how these two features relate individually to the prices.
+
+```{r, message = F, warning=F, tidy=TRUE, comment = ""}
+attach(mydata)
+par(mfrow=c(2,2))
+boxplot(price_usd~prop_starrating,xlab="Property star rating",ylab="Property price",main="Boxplot"); boxplot(price_usd~prop_review_score,xlab="Property review score",ylab="Property price",main="Boxplot"); 
+interaction.plot( prop_starrating , prop_review_score ,price_usd,xlab="Property star rating",ylab="Property price",main="Interaction plot"); 
+interaction.plot( prop_review_score , prop_starrating,price_usd,xlab="Property review score",ylab="Property price",main="Interaction plot"); 
+```
+
+The results confirm what has been until now stated: in general, the higher the star ratings, the higher is the median property price. The same stands for review score, however the same property price can be object of different review scores. 
+
+```{r, message = F, warning=F, tidy=TRUE, comment = ""}
+aovpen=lm(price_usd~prop_starrating+prop_review_score,data=mydata)
+anova(aovpen)
+drop1(aovpen,test="Chisq")
+par(mfrow=c(1,2))
+qqnorm(residuals(aovpen))
+plot(fitted(aovpen),residuals(aovpen))
+```
+
+The results shown in last column of the model Pr(>F) show that both explanatory variables are highly relevant, as these values are of the order of zero. The results of the first plot, which shows the QQ-plot of the residuals, do not present normal distribution as it does not follow a straight line, and is somewhat curved. Regarding heteroscedasticity, when there is a completely random and equal distribution of points throughout the range of the X-axis, it does not exist. Visually looking at the plot in the left, we can state that heteroscedasticity is present since the points distribution around the X-axis do not seem to be equally distributed.
+
+Now, we will make a new approach which deals with the following question: How does marital status affect hotel choices? For such, we will study the influence of the explanatory variable "consumer" in our model.
+
+```{r}
+aovpen=lm(price_usd~consumer,data=mydata)
+anova(aovpen)
+```
+
+The type of consumer also affects the prices of the properties, as it can be stated by the low Pr(>F) which is of dimension 0.001.
+
+### Step-wise Decrease Method
+
+We will perform a step-wise decrease method in an experiment with an outcome Y that is 0 or 1 ("booking_bool") and its numerical and factor explanatory variables.
+
+```{r}
+myglm=glm(booking_bool~
+                         prop_starrating
+          +prop_review_score
+            +prop_location_score1
+            +prop_location_score2
+            +price_usd
+            +promotion_flag
+            +consumer
+            ,data=mydata,family=binomial)
+drop1(myglm,test="Chisq")
+```
+
+Now, we must check whether the coefficients are individually equal to zero (hypothesis H0) in the step-wise decrease method. As we can see in the last column in the summary of the model, the highest value is present for the variable "prop_starrating". Thus, we will remove this variable from the model. The step-wise decrease method continues.
+
+```{r}
+myglm=glm(booking_bool~
+            prop_review_score
+            +prop_location_score1
+            +prop_location_score2
+            +price_usd
+            +promotion_flag
+            +consumer
+            ,data=mydata,family=binomial)
+drop1(myglm,test="Chisq")
+```
+
+Now, all the values in the last column are lower than 0.05, which indicates that they are all significant to the model. It is now time to explore the effects of the variable "consumer" in our model through interaction plots.
+
+```{r}
+par(mfrow=c(2,2))
+interaction.plot( prop_starrating , consumer ,price_usd,xlab="Property star rating",ylab="Property price",main="Interaction plot"); 
+interaction.plot( prop_review_score , consumer ,price_usd,xlab="Property review score",ylab="Property price",main="Interaction plot"); 
+interaction.plot( promotion_flag , consumer ,price_usd,xlab="Promotion flag",ylab="Property price",main="Interaction plot"); 
+#interaction.plot( prop_location_score1 , consumer ,price_usd,xlab="Property location 1",ylab="Property price",main="Interaction plot"); 
+#interaction.plot( prop_location_score2 , consumer ,price_usd,xlab="Property location 2",ylab="Property price",main="Interaction plot"); 
+
+```
+
