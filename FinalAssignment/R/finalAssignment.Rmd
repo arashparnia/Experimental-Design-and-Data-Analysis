@@ -67,6 +67,10 @@ mydata <- mydata[which(mydata$prop_review_score !=  0),]
 mydata <- mydata[which(mydata$srch_id < 4000),]
 # mydata <- head(mydata,1000)
 summary(mydata)
+library(xtable)
+options(xtable.floating = FALSE)
+options(xtable.timestamp = "")
+xtable(summary(mydata[ c(srch_id,site_id,prop_id,booking_bool,consumer)]))
 ```
 The data set now has 2611 search ids in which 2360 are uniqe.
 The subsetting data was done using search id to have a ocnsistant and real user inputs rather ran sampeling random data which might not nesseserily represent the user's prefrences.
@@ -164,7 +168,7 @@ interaction.plot( prop_review_score , prop_starrating,price_usd ); interaction.p
 mydata$prop_starrating=factor(mydata$prop_starrating)
 mydata$prop_review_score=factor(mydata$prop_review_score)
 
-aovpen=lm(price_usd~prop_starrating+prop_review_score,data=mydata)
+aovpen=lm(price_usd~prop_starrating + consumer,data=mydata)
 
 anova(aovpen)
 summary(aovpen)
