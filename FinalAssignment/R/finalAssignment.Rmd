@@ -169,6 +169,7 @@ aovpen=lm(price_usd~prop_starrating+prop_review_score,data=mydata)
 anova(aovpen)
 summary(aovpen)
 drop1(aovpen,test="Chisq")
+par(mfrow=c(1,2))
 qqnorm(residuals(aovpen))
 plot(fitted(aovpen),residuals(aovpen))
 
